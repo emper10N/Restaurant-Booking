@@ -1,0 +1,137 @@
+<p-card header="Новое бронирование" styleClass="page-card booking-page">
+  @if (initialLoading()) {
+    <p class="muted">Загрузка справочников…</p>
+  }
+  @if (info()) {
+    <p [class]="infoIsError() ? 'error banner' : 'ok banner'">{{ info() }}</p>
+  }
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="grid">
+      <label class="col-12 md:col-4">
+        Дата
+        <input type="date" formControlName="bookingDate" [min]="todayStr" [max]="maxDateStr" />
+      </label>
+      <label class="col-12 md:col-4">
+        Время
+        <select formControlName="timeStart">
+          @for (slot of timeSlots; track slot) {
+            <option [value]="slot">{{ slot }}</option>
+          }
+        </select>
+      </label>
+      <label class="col-12 md:col-4">
+        Гости
+        <input type="number" formControlName="guestCount" min="1" max="20" />
+      </label>
+    </div>
+    <div class="grid">
+      <div class="col-12">
+        <button type="button" class="btn-secondary w-full md:w-auto" (click)="loadTables()">
+          Показать доступные столы
+        </button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <label class="col-12 md:col-6">
+        Повод визита
+        <select formControlName="reasonId" (change)="onReasonChange()">
+          <option [value]="0">Выберите повод</option>
+          @for (reason of reasons(); track reason.id) {
+            <option [value]="reason.id">{{ reason.name || $any(reason).displayName }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="col-12 md:col-6">
+        Пакет услуг (необязательно)
+        <select formControlName="packageId" (change)="onPackageChange()">
+          <option [value]="0">Без пакета</option>
+          @for (pack of packages(); track pack.id) {
+            <option [value]="pack.id">
+              {{ pack.name }}
+              @if (pack.totalPrice != null) {
+                ({{ pack.totalPrice }} ₽)
+              }
+            </option>
+          }
+        </select>
+      </label>
+    </div>
+
+    <fieldset>
+  <legend>Дополнительные услуги</legend>
+  
+  @if (selectedPackage(); as pkg) {
+    <p class="muted small mb-3">
+      В пакет "{{ pkg.name }}" включены услуги: {{ pkg.services?.length ?? 0 }} шт.
+    </p>
+    }
+  
+  <div class="grid">
+    @for (service of services(); track service.id) {
+      <div class="col-12 md:col-4">
+        <div class="flex align-items-center gap-2" [class.package-service]="isPackageService(service.id)">
+          <p-checkbox 
+            [inputId]="'service_' + service.id"
+            [value]="service.id"
+            [ngModelOptions]="{standalone: true}"
+            [(ngModel)]="serviceCheckState[service.id]"
+            [disabled]="isServiceDisabled(service.id)"
+            (onChange)="toggleService(service.id, $event.checked)"
+            [binary]="true">
+          </p-checkbox>
+          <label [for]="'service_' + service.id">
+            {{ service.name }} ({{ service.price}} ₽)
+            @if (isPackageService(service.id)) {
+              <span class="package-badge"></span>
+            }
+          </label>
+        </div>
+      </div>
+    }
+  </div>
+</fieldset>
+
+
+    <div class="price-summary">
+      <p>
+        <strong>Стоимость дополнительных услуг:</strong>
+        {{ extraServicesTotal() }} ₽
+      </p>
+    </div>
+
+    <div class="grid">
+      <label class="col-12 md:col-6">
+        Зона
+        <select formControlName="zoneName" (change)="onZoneChange()">
+          <option value="">Все зоны</option>
+          @for (z of zones(); track z) {
+            <option [value]="z">{{ z }}</option>
+          }
+        </select>
+      </label>
+      
+      <label class="col-12 md:col-6">
+        Стол
+        <p-autocomplete formControlName="tableId" [dropdown]="true " [suggestions]="items" (completeMethod)="search($event)" />
+      </label>
+    </div>
+
+    @if (table; as t) {
+      <div class="table-hint">
+        <p><strong>Вместимость:</strong> {{ t.capacity }} гостей</p>
+        @if (t.locationDescription) {
+          <p><strong>Расположение:</strong> {{ t.locationDescription }}</p>
+        }
+      </div>
+    }
+    <p-floatlabel>
+      <textarea id="over_label" [autoResize]="true" pTextarea formControlName="comment" class="col-12 md:col-12"></textarea>
+      <label for="over_label">Комментарий</label>
+    </p-floatlabel>
+    <button type="submit" class="w-full md:w-auto" [disabled]="submitting() || initialLoading()">
+      {{ submitting() ? 'Отправка…' : 'Забронировать' }}
+    </button>
+  </form>
+</p-card>

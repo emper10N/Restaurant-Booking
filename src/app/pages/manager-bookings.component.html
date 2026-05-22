@@ -1,0 +1,132 @@
+<p-card [header]="pageTitle" styleClass="page-card">
+  <form [formGroup]="filtersForm" (ngSubmit)="search()">
+    <div class="grid">
+      <label class="col-12 sm:col-6 md:col-4">Дата с <input class="w-full" type="date" formControlName="dateFrom" /></label>
+      <label class="col-12 sm:col-6 md:col-4">Дата по <input class="w-full" type="date" formControlName="dateTo" /></label>
+      <label class="col-12 sm:col-6 md:col-4">
+        Статус
+        <select class="w-full" formControlName="status">
+          <option value="">Все</option>
+          @for (status of statusOptions; track status) {
+            <option [value]="status">{{ status }}</option>
+          }
+        </select>
+      </label>
+      <label class="col-12 sm:col-6 md:col-4">ID пользователя <input class="w-full" type="number" formControlName="userId" /></label>
+      <label class="col-12 sm:col-6 md:col-4">ID стола <input class="w-full" type="number" formControlName="tableId" /></label>
+      <div class="col-12 sm:col-6 md:col-4 flex align-items-end">
+        <button type="submit" class="w-full" [disabled]="loading()">{{ loading() ? '…' : 'Применить фильтры' }}</button>
+      </div>
+    </div>
+  </form>
+
+  @if (loading()) {
+    <p class="muted">Загрузка…</p>
+  }
+
+  <div class="table-scroll">
+    <table class="bookings-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Дата</th>
+          <th>Время</th>
+          <th>Клиент</th>
+          <th>Стол</th>
+          <th>Гости</th>
+          <th>Статус</th>
+          <th>Сумма услуг</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of bookings(); track item.id) {
+          <tr class="row-click" (click)="openDetail(item.id)">
+            <td>{{ item.id }}</td>
+            <td>{{ item.bookingDate }}</td>
+            <td>{{ item.timeStart!.slice(0, 5) }}</td>
+            <td>{{ item.userFullName }}</td>
+            <td>№{{ item.table!.number }} ({{ item.table!.zoneName }})</td>
+            <td>{{ item.guestCount }}</td>
+            <td>
+              <span class="status-badge" [class]="statusClass(item.status)">{{ item.status }}</span>
+            </td>
+            <td>{{ item.totalServicesPrice ?? 0 }} ₽</td>
+          </tr>
+        } @empty {
+          @if (!loading()) {
+            <tr>
+              <td colspan="8">Данные не найдены</td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+</p-card>
+
+@if (detail() !== null || detailLoading()) {
+  <div class="modal-backdrop" (click)="closeDetail()">
+    <div class="modal card" (click)="$event.stopPropagation()">
+      <div class="modal-head">
+        <h2>Бронирование #{{ detail()?.id }}</h2>
+        <button type="button" class="btn-icon" (click)="closeDetail()" aria-label="Закрыть">×</button>
+      </div>
+      @if (detailLoading()) {
+        <p>Загрузка…</p>
+      } @else if (detail(); as d) {
+        <dl class="detail-grid">
+          <dt>Клиент</dt>
+          <dd>{{ d.userFullName }}</dd>
+          <dt>Дата</dt>
+          <dd>{{ d.bookingDate }}</dd>
+          <dt>Время</dt>
+          <dd>{{ d.timeStart!.slice(0, 5) }} — {{ d.timeEnd?.slice(0, 5) }}</dd>
+          <dt>Стол</dt>
+          <dd>№{{ d.table!.number }}, {{ d.table!.zoneName }}</dd>
+          <dt>Гости</dt>
+          <dd>{{ d.guestCount }}</dd>
+          <dt>Повод</dt>
+          <dd>{{ d.reason?.displayName }}</dd>
+          <dt>Статус</dt>
+          <dd>
+            <span class="status-badge" [class]="statusClass(d.status)">{{ d.status }}</span>
+          </dd>
+          <dt>Комментарий</dt>
+          <dd>{{ d.comment || '—' }}</dd>
+          <dt>Услуги</dt>
+          <dd>
+            @if (d.services?.length) {
+              <ul class="services-list">
+                @for (s of d.services; track s.serviceId) {
+                  <li>{{ s.serviceName }} × {{ s.quantity ?? 1 }} — {{ s.totalPrice }} ₽</li>
+                }
+              </ul>
+            } @else {
+              —
+            }
+          </dd>
+          <dt>Сумма услуг</dt>
+          <dd>{{ d.totalServicesPrice ?? 0 }} ₽</dd>
+        </dl>
+
+        @if (auth.hasRole(['ADMIN'])) {
+          <div class="admin-actions">
+            <p class="muted small">Смена статуса (только ADMIN):</p>
+            <div class="action-row">
+              @for (a of adminQuickActions; track a.status) {
+                <button
+                  type="button"
+                  class="btn-action {{ a.variant }}"
+                  [disabled]="statusUpdating() === d.id"
+                  (click)="setStatus(d.id, a.status); $event.stopPropagation()"
+                >
+                  {{ a.label }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+}

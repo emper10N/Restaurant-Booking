@@ -1,0 +1,110 @@
+@if (notify.message()) {
+  <div class="flash-banner" role="alert">
+    <span>{{ notify.message() }}</span>
+    <button type="button" class="btn-icon" (click)="dismissFlash()" aria-label="Закрыть">×</button>
+  </div>
+}
+
+<header class="header">
+  <div class="header__row">
+    <div class="header__brand-wrap">
+      @if (isMobile()) {
+        <p-button
+          type="button"
+          icon="pi pi-bars"
+          [text]="true"
+          rounded="true"
+          severity="secondary"
+          styleClass="header__menu-btn"
+          ariaLabel="Открыть меню"
+          (onClick)="drawerOpen = true"
+        />
+      }
+      @if (auth.isAuthenticated()) {
+        <a routerLink="/booking" class="brand-link" (click)="closeDrawer()">Ресторан · бронь</a>
+      } @else {
+        <span class="brand-text">Ресторан · бронь</span>
+      }
+    </div>
+
+    @if (!isMobile() && auth.isAuthenticated()) {
+      <nav class="nav-main" aria-label="Основное меню">
+        <a routerLink="/booking">Забронировать</a>
+        <a routerLink="/my-bookings">Мои бронирования</a>
+        @if (auth.hasRole(['MANAGER']) && !auth.hasRole(['ADMIN'])) {
+          <a routerLink="/manager/bookings">Все бронирования</a>
+          <a routerLink="/manager/tables">Столы и зоны</a>
+          <a routerLink="/manager/services">Услуги и пакеты</a>
+        }
+        @if (auth.hasRole(['ADMIN'])) {
+          <a routerLink="/admin/bookings">Бронирования</a>
+          <a routerLink="/admin/tables">Столы и зоны</a>
+          <a routerLink="/admin/services">Услуги</a>
+          <a routerLink="/admin/reasons">Поводы визита</a>
+          <a routerLink="/admin/packages">Пакеты услуг</a>
+          <a routerLink="/admin/users">Пользователи</a>
+        }
+      </nav>
+      <div class="user-box">
+        <span class="user-name">{{ auth.user()?.fullName }}</span>
+        <details class="user-menu">
+          <summary>Аккаунт</summary>
+          <div class="user-menu__panel">
+            <a routerLink="/profile">Профиль</a>
+            <a routerLink="/profile/password">Сменить пароль</a>
+            <button type="button" (click)="logout()">Выход</button>
+          </div>
+        </details>
+      </div>
+    }
+
+    @if (!isMobile() && !auth.isAuthenticated()) {
+      <nav class="nav-main nav-main--guest" aria-label="Вход">
+        <a routerLink="/login">Вход</a>
+        <a routerLink="/register">Регистрация</a>
+      </nav>
+    }
+  </div>
+</header>
+
+@if (isMobile()) {
+<p-drawer
+  [(visible)]="drawerOpen"
+  position="left"
+  header="Меню"
+  styleClass="app-drawer"
+>
+  @if (auth.isAuthenticated()) {
+    <div class="drawer-user muted small mb-3">{{ auth.user()?.fullName }}</div>
+    <nav class="drawer-nav" (click)="closeDrawer()">
+      <a routerLink="/booking">Забронировать</a>
+      <a routerLink="/my-bookings">Мои бронирования</a>
+      @if (auth.hasRole(['MANAGER']) && !auth.hasRole(['ADMIN'])) {
+        <a routerLink="/manager/bookings">Все бронирования</a>
+        <a routerLink="/manager/tables">Столы и зоны</a>
+        <a routerLink="/manager/services">Услуги и пакеты</a>
+      }
+      @if (auth.hasRole(['ADMIN'])) {
+        <a routerLink="/admin/bookings">Бронирования</a>
+        <a routerLink="/admin/tables">Столы и зоны</a>
+        <a routerLink="/admin/services">Услуги</a>
+        <a routerLink="/admin/reasons">Поводы визита</a>
+        <a routerLink="/admin/packages">Пакеты услуг</a>
+        <a routerLink="/admin/users">Пользователи</a>
+      }
+      <a routerLink="/profile">Профиль</a>
+      <a routerLink="/profile/password">Сменить пароль</a>
+      <button type="button" class="drawer-logout" (click)="logout(); closeDrawer()">Выход</button>
+    </nav>
+  } @else {
+    <nav class="drawer-nav" (click)="closeDrawer()">
+      <a routerLink="/login">Вход</a>
+      <a routerLink="/register">Регистрация</a>
+    </nav>
+  }
+</p-drawer>
+}
+
+<main class="main-content">
+  <router-outlet />
+</main>

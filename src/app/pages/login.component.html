@@ -1,0 +1,28 @@
+<p-card header="Вход" styleClass="page-card page-card--narrow mx-auto">
+  @if (error()) {
+    <p class="error banner">{{ error() }}</p>
+  }
+  @if (lockSec() > 0) {
+    <p class="muted">Блокировка: осталось {{ lockSec() }} с</p>
+  }
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <p-floatlabel class="col-12 md:col-12" variant="on">
+        <input class="w-full" formControlName="login" pInputText/>
+        <label for="on_label">Логин</label>
+      </p-floatlabel>
+    <p-floatlabel class="col-12 md:col-12" variant="on">
+        <p-password [toggleMask]="true"  formControlName="password"
+        [style]="{'width': '100%'}" 
+        [inputStyle]="{'width': '100%'}" 
+        autocomplete="off"
+        [feedback]="false"
+      />
+        <label for="on_label">Пароль</label>
+      </p-floatlabel>
+    <button type="submit" class="w-full md:w-auto" [disabled]="loading()">{{ loading() ? 'Вход…' : 'Войти' }}</button>
+  </form>
+  <p class="muted">
+    Нет аккаунта?
+    <a routerLink="/register">Регистрация</a>
+  </p>
+</p-card>
