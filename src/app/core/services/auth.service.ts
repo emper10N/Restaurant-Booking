@@ -1,7 +1,7 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs';
-import { ApiResponse, AuthPayload, User, UserRole } from './models';
+import { ApiResponse, AuthPayload, User, UserRole } from '../models/models';
 
 const API_BASE = '';
 const TOKEN_KEY = 'auth_token';

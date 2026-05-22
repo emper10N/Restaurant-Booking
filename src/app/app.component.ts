@@ -5,8 +5,8 @@ import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { Button } from 'primeng/button';
 import { Drawer } from 'primeng/drawer';
-import { AuthService } from './core/auth.service';
-import { NotificationService } from './core/notification.service';
+import { AuthService } from './core/services/auth.service';
+import { NotificationService } from './core/services/notification.service';
 import { MenubarModule } from 'primeng/menubar';
 import { MenuItem } from 'primeng/api';
 

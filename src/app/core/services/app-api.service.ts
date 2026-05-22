@@ -11,7 +11,7 @@ import {
   TableItem,
   UserListItem,
   ZoneItem
-} from './models';
+} from '../models/models';
 import { Observable, of, tap, throwError } from 'rxjs';
 
 const API_BASE = '/api';

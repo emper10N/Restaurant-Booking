@@ -1,19 +1,19 @@
 import { Routes } from '@angular/router';
-import { authGuard, publicOnlyGuard, roleGuard } from './core/guards';
-import { BookingComponent } from './pages/booking.component';
-import { AdminPackagesComponent } from './pages/admin-packages.component';
-import { AdminReasonsComponent } from './pages/admin-reasons.component';
-import { AdminServicesComponent } from './pages/admin-services.component';
-import { AdminTablesComponent } from './pages/admin-tables.component';
-import { AdminUsersComponent } from './pages/admin-users.component';
-import { LoginComponent } from './pages/login.component';
-import { ManagerBookingsComponent } from './pages/manager-bookings.component';
-import { ManagerServicesComponent } from './pages/manager-services.component';
-import { ManagerTablesComponent } from './pages/manager-tables.component';
-import { MyBookingsComponent } from './pages/my-bookings.component';
-import { PasswordComponent } from './pages/password.component';
-import { ProfileComponent } from './pages/profile.component';
-import { RegisterComponent } from './pages/register.component';
+import { authGuard, publicOnlyGuard, roleGuard } from './core/guards/guards';
+import { BookingComponent } from './pages/booking/booking.component';
+import { AdminPackagesComponent } from './pages/admin-pages/packages/admin-packages.component';
+import { AdminReasonsComponent } from './pages/admin-pages/reasons/admin-reasons.component';
+import { AdminServicesComponent } from './pages/admin-pages/services/admin-services.component';
+import { AdminTablesComponent } from './pages/admin-pages/tables/admin-tables.component';
+import { AdminUsersComponent } from './pages/admin-pages/users/admin-users.component';
+import { LoginComponent } from './pages/login/login.component';
+import { ManagerBookingsComponent } from './pages/manager-pages/bookings/manager-bookings.component';
+import { ManagerServicesComponent } from './pages/manager-pages/services/manager-services.component';
+import { ManagerTablesComponent } from './pages/manager-pages/tables/manager-tables.component';
+import { MyBookingsComponent } from './pages/my-bookings/my-bookings.component';
+import { PasswordComponent } from './pages/change-password/password.component';
+import { ProfileComponent } from './pages/profile/profile.component';
+import { RegisterComponent } from './pages/register/register.component';
 
 export const routes: Routes = [
   { path: 'login', canActivate: [publicOnlyGuard], component: LoginComponent },

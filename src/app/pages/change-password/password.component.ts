@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Card } from 'primeng/card';
-import { AppApiService } from '../core/app-api.service';
+import { AppApiService } from '../../core/services/app-api.service';
 
 @Component({
   selector: 'app-password',

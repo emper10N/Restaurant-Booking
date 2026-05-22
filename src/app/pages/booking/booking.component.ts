@@ -1,8 +1,8 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Card } from 'primeng/card';
-import { AppApiService } from '../core/app-api.service';
-import { PackageItem, SelectItem, ServiceItem, TableItem } from '../core/models';
+import { AppApiService } from '../../core/services/app-api.service';
+import { PackageItem, SelectItem, ServiceItem, TableItem } from '../../core/models/models';
 import { TextareaModule } from 'primeng/textarea';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { AutoCompleteModule } from 'primeng/autocomplete';

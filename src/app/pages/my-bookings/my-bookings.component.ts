@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { Card } from 'primeng/card';
-import { AppApiService } from '../core/app-api.service';
-import { Booking } from '../core/models';
+import { AppApiService } from '../../core/services/app-api.service';
+import { Booking } from '../../core/models/models';
 
 @Component({
   selector: 'app-my-bookings',

@@ -2,9 +2,9 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Card } from 'primeng/card';
-import { AppApiService } from '../core/app-api.service';
-import { Booking } from '../core/models';
-import { AuthService } from '../core/auth.service';
+import { AppApiService } from '../../../core/services/app-api.service';
+import { Booking } from '../../../core/models/models';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-manager-bookings',

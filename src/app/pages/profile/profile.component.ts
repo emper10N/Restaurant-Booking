@@ -2,9 +2,9 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Card } from 'primeng/card';
-import { AppApiService } from '../core/app-api.service';
-import { AuthService } from '../core/auth.service';
-import { UserListItem } from '../core/models';
+import { AppApiService } from '../../core/services/app-api.service';
+import { AuthService } from '../../core/services/auth.service';
+import { UserListItem } from '../../core/models/models';
 
 const namePattern = /^[A-Za-zА-Яа-я-]+$/;
 const phonePattern = /^\+7\d{10}$/;
