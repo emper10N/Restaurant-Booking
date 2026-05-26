@@ -140,9 +140,7 @@ export class BookingComponent {
     }
     });
     
-    // Инициализируем при загрузке
     let initialDate = this.form.controls.bookingDate.value;
-    console.log(initialDate)
     if (initialDate) {
       this.updateTimeSlots(initialDate);
     }
@@ -159,7 +157,7 @@ export class BookingComponent {
         this.form.patchValue({ timeStart: slots[0] });
       }
     } else {
-      this.form.patchValue({ timeStart: '' });
+      this.form.patchValue({ timeStart: slots[0] });
       this.info.set('На сегодня свободных слотов больше нет');
       this.infoIsError.set(true);
     }
@@ -171,7 +169,6 @@ export class BookingComponent {
     if (date) {
       this.updateTimeSlots(date);
       
-      // Проверяем, можно ли бронировать на сегодня
       if (date === this.todayStr && !this.dateService.canBookToday()) {
         this.info.set('Бронирование на сегодня недоступно (после 22:00)');
         this.infoIsError.set(true);
@@ -257,7 +254,6 @@ export class BookingComponent {
   
   for (const s of pkg.services ?? []) {
     packageServiceIds.add(s.serviceId);
-    // Автоматически отмечаем чекбоксы пакета
     this.serviceCheckState[s.serviceId] = true;
   }
   
@@ -285,7 +281,6 @@ export class BookingComponent {
       return;
     }
     const data = this.form.getRawValue();
-    console.log(data)
     let id = this.form.get('tableId')!.value;
     this.table = this.tables().find((t) => t.id === id);
       
@@ -310,7 +305,6 @@ export class BookingComponent {
       packageId: data.packageId || null
     };
     this.submitting.set(true);
-    console.log(this.form.controls.tableId.value)
     this.api.createBooking(payload).subscribe({
       next: () => {
         this.submitting.set(false);
@@ -318,6 +312,7 @@ export class BookingComponent {
         this.infoIsError.set(false);
       },
       error: (err) => {
+        console.log(payload);
         this.submitting.set(false);
         this.info.set(err?.error?.message ?? 'Ошибка создания бронирования');
         this.infoIsError.set(true);

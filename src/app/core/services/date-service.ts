@@ -41,7 +41,6 @@ export class DateService {
     let startMinute = 0;
     
     if (targetDay.getDay() === today.getDay()) {
-      console.log(today.getTime())
       const currentHour = now.getHours();
       const currentMinute = now.getMinutes();
       
@@ -73,7 +72,6 @@ export class DateService {
   
   isTimeAvailable(date: string, time: string): boolean {
     const now = this.getCurrentTime();
-    const [hours, minutes] = time.split(':').map(Number);
     const slotDateTime = new Date(`${date}T${time}:00`);
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const slotDay = new Date(slotDateTime.getFullYear(), slotDateTime.getMonth(), slotDateTime.getDate());

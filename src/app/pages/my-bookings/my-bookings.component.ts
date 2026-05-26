@@ -54,7 +54,7 @@ export class MyBookingsComponent {
     this.loading.set(true);
     this.api.getMyBookings().subscribe({
       next: (res) => {
-        const items = (res.data ?? []).sort((a, b) => (a.bookingDate < b.bookingDate ? 1 : -1));
+        const items = (res.data ?? []).sort((a, b) => (a.id < b.id ? 1 : -1));
         this.bookings.set(items);
         this.loading.set(false);
       },

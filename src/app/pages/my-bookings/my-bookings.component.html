@@ -3,10 +3,10 @@
     <p class="muted">Загрузка…</p>
   }
   <div class="bookings-grid">
-    @for (item of bookings(); track item.id) {
+    @for (item of bookings(); track item.id; let index = $index) {
       <article class="booking-card">
         <header class="booking-card__head">
-          <h3>#{{ item.id }}</h3>
+          <h3>#{{ bookings().length - index }}</h3>
           <span class="status-badge" [class]="statusClass(item.status)">{{ stat }}</span>
         </header>
         <p class="muted">
