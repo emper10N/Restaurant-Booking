@@ -8,17 +8,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { FormsModule } from '@angular/forms';
 import { CheckboxModule } from 'primeng/checkbox';
-
-function generateTimeSlots(): string[] {
-  const slots: string[] = [];
-  for (let h = 10; h <= 22; h++) {
-    for (const m of [0, 30]) {
-      if (h === 22 && m > 0) break;
-      slots.push(`${String(h).padStart(2, '0')}:${m === 0 ? '00' : '30'}`);
-    }
-  }
-  return slots;
-}
+import { DateService } from '../../core/services/date-service';
 
 interface AutoCompleteCompleteEvent {
     originalEvent: Event;
@@ -33,6 +23,7 @@ interface AutoCompleteCompleteEvent {
 })
 export class BookingComponent {
   private readonly fb = inject(FormBuilder);
+  readonly dateService = inject(DateService);
   private readonly api = inject(AppApiService);
 
   readonly reasons = signal<SelectItem[]>([]);
@@ -47,6 +38,7 @@ export class BookingComponent {
   readonly initialLoading = signal(true);
   readonly tablesLoading = signal(false);
   readonly submitting = signal(false);
+  readonly timeSlots = signal<string[]>([]);
   items!: any[];
   value!: any;
   table!: any;
@@ -56,7 +48,7 @@ export class BookingComponent {
   readonly pkgPrice = computed(() => {
   const pkg = this.selectedPackage();
   return pkg?.totalPrice ?? 0;
-});
+  });
 
   toggleService(serviceId: number, checked: boolean) {
     this.selectedServices[serviceId] = checked;
@@ -73,19 +65,17 @@ export class BookingComponent {
   return this.packageServiceIds().has(id);
 }
 
-// Проверка, заблокирован ли сервис (из пакета и не отключен вручную)
-isServiceDisabled(id: number): boolean {
-  return this.isPackageService(id);
-}
+
+  isServiceDisabled(id: number): boolean {
+    return this.isPackageService(id);
+  }
   
   isServiceChecked(id: number): boolean {
     return this.selectedServiceIds().includes(id);
   }
 
-  readonly timeSlots = generateTimeSlots();
-
   readonly todayStr = (() => {
-    const d = new Date();
+    const d = new Date(new Date().getTime()+ 5*60*60*1000);
     return d.toISOString().slice(0, 10);
   })();
 
@@ -141,6 +131,52 @@ isServiceDisabled(id: number): boolean {
 
   constructor() {
     this.loadInitialData();
+  }
+
+  ngOnInit() {
+    this.form.controls.bookingDate.valueChanges.subscribe(date => {
+      if (date) {
+        this.updateTimeSlots(date);
+    }
+    });
+    
+    // Инициализируем при загрузке
+    let initialDate = this.form.controls.bookingDate.value;
+    console.log(initialDate)
+    if (initialDate) {
+      this.updateTimeSlots(initialDate);
+    }
+  }
+
+    private updateTimeSlots(date: string) {
+    let slots = this.dateService.generateFutureTimeSlots(date);
+    this.timeSlots.set(slots);
+    
+    if (slots.length > 0) {
+      let currentTime = this.form.controls.timeStart.value;
+      
+      if (!currentTime || !slots.includes(currentTime)) {
+        this.form.patchValue({ timeStart: slots[0] });
+      }
+    } else {
+      this.form.patchValue({ timeStart: '' });
+      this.info.set('На сегодня свободных слотов больше нет');
+      this.infoIsError.set(true);
+    }
+  }
+  
+  // При изменении даты вручную
+  onDateChange() {
+    const date = this.form.controls.bookingDate.value;
+    if (date) {
+      this.updateTimeSlots(date);
+      
+      // Проверяем, можно ли бронировать на сегодня
+      if (date === this.todayStr && !this.dateService.canBookToday()) {
+        this.info.set('Бронирование на сегодня недоступно (после 22:00)');
+        this.infoIsError.set(true);
+      }
+    }
   }
 
   loadTables() {
@@ -310,6 +346,6 @@ isServiceDisabled(id: number): boolean {
       },
       error: () => done()
     });
-    this.form.patchValue({ bookingDate: this.todayStr, timeStart: '19:00' });
+    this.form.patchValue({ bookingDate: this.todayStr, timeStart: this.dateService.generateFutureTimeSlots(this.todayStr)[0] });
   }
 }

@@ -7,12 +7,19 @@
     <fieldset>
       <legend>Услуги (quantity=1)</legend>
       <div class="grid">
+        
         @for (service of services(); track service.id) {
-          <label class="col-12 sm:col-6 md:col-4">
-            <input type="checkbox" (change)="toggleService(service.id, $any($event.target).checked)" />
+          <label class="col-12 sm:col-3 md:col-4">
+            <p-checkbox 
+            [inputId]="'service_' + service.id"
+            [value]="service.id"
+            (onChange)="toggleService(service.id, $event.checked)"
+            [binary]="true">
+            </p-checkbox>
             {{ service.name }} ({{ service.price }} ₽)
           </label>
         }
+        
       </div>
     </fieldset>
     <fieldset>
@@ -20,7 +27,12 @@
       <div class="grid">
         @for (reason of reasons(); track reason.id) {
           <label class="col-12 sm:col-6 md:col-4">
-            <input type="checkbox" (change)="toggleReason(reason.id, $any($event.target).checked)" />
+            <p-checkbox 
+            [inputId]="'service_' + reason.id"
+            [value]="reason.id"
+            (onChange)="toggleReason(reason.id, $event.checked)"
+            [binary]="true">
+            </p-checkbox>
             {{ reason.displayName }}
           </label>
         }

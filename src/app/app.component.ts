@@ -8,7 +8,6 @@ import { Drawer } from 'primeng/drawer';
 import { AuthService } from './core/services/auth.service';
 import { NotificationService } from './core/services/notification.service';
 import { MenubarModule } from 'primeng/menubar';
-import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-root',

@@ -3,11 +3,12 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Card } from 'primeng/card';
 import { AppApiService } from '../../../core/services/app-api.service';
 import { PackageItem, ReasonItem, ServiceItem } from '../../../core/models/models';
+import { CheckboxModule } from 'primeng/checkbox';
 
 @Component({
   selector: 'app-admin-packages',
   standalone: true,
-  imports: [ReactiveFormsModule, Card],
+  imports: [ReactiveFormsModule, Card, CheckboxModule],
   templateUrl: './admin-packages.component.html'
 })
 export class AdminPackagesComponent {
@@ -33,7 +34,7 @@ export class AdminPackagesComponent {
   constructor() {
     this.reload();
   }
-
+  
   reload() {
     this.api.getPackages({ activeOnly: false }).subscribe((res) => this.packages.set(res.data ?? []));
     this.api.getServices(false).subscribe((res) => this.services.set(res.data ?? []));

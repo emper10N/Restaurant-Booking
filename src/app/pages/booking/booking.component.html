@@ -14,9 +14,12 @@
       <label class="col-12 md:col-4">
         Время
         <select formControlName="timeStart">
-          @for (slot of timeSlots; track slot) {
-            <option [value]="slot">{{ slot }}</option>
-          }
+          @if (timeSlots().length === 0) {
+      <option value="">Нет доступного времени</option>
+    }
+    @for (slot of timeSlots(); track slot) {
+      <option [value]="slot">{{ slot }}</option>
+    }
         </select>
       </label>
       <label class="col-12 md:col-4">
