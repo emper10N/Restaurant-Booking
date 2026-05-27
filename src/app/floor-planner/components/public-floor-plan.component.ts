@@ -1,13 +1,9 @@
-import { Component, AfterViewInit, ViewChild, ElementRef, input, Input } from '@angular/core';
+import { Component, AfterViewInit, ViewChild, ElementRef, input, Input, Signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ApiResponse, ZoneItem } from '../../core/models/models';
 import * as fabric from 'fabric';
-
-interface Zone {
-  id: number;
-  name: string;
-  color: string;
-}
+import { Observable } from 'rxjs';
 
 interface TableData {
   tableId: number;
@@ -35,7 +31,8 @@ interface TableData {
 export class PublicFloorPlanComponent implements AfterViewInit {
   @ViewChild('canvasEl') canvasRef!: ElementRef<HTMLCanvasElement>;
   private canvas!: fabric.Canvas;
-  public zones: Zone[] = []; // публичное поле для доступа из шаблона
+  @Input()
+  zones!: Signal<Observable<ApiResponse<ZoneItem[]>>>;
   private tables: TableData[] = [];
   private gridSize = 20;
 
@@ -49,7 +46,7 @@ export class PublicFloorPlanComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.canvas = new fabric.Canvas(this.canvasRef.nativeElement);
-    (this.canvas as any).setDimensions({ width: 1000, height: 600 });
+    (this.canvas as any).setDimensions({ width: 410, height: 610 });
     this.canvas.setZoom(1);
     this.canvas.selection = false;
     this.canvas.defaultCursor = 'pointer';
@@ -69,10 +66,6 @@ export class PublicFloorPlanComponent implements AfterViewInit {
       // this.zones = response.zones;
       // this.tables = response.tables; // tables уже содержат поле booked
       // Пока используем демо-данные
-      this.zones = [
-        { id: 1, name: 'Терраса', color: '#00aa00' },
-        { id: 2, name: 'VIP зал', color: '#ffaa00' }
-      ];
       // Имитация бронирований: для текущего времени считаем, что стол 2 забронирован
       const isBooked = (tableId: number) => {
         // здесь должна быть логика на основе реальных броней
@@ -112,8 +105,13 @@ export class PublicFloorPlanComponent implements AfterViewInit {
 
   private renderTables(): void {
     for (const t of this.tables) {
-      const zone = this.zones.find(z => z.id === t.zoneId);
-      const strokeColor = zone ? zone.color : '#999';
+
+      let zone:any ;
+      this.zones().subscribe(response => {
+        if (!response.data) return;
+        zone = response.data.find(zone => zone.id === t.zoneId);
+      });
+      const strokeColor = '#999';
       let fillColor = '#d4edda'; // свободен
       if (t.booked) fillColor = '#f8d7da';
       else if (t.status === 'maintenance') fillColor = '#fff3cd';
@@ -138,6 +136,7 @@ export class PublicFloorPlanComponent implements AfterViewInit {
       const group = new fabric.Group([rect, text], {
         left: t.left, top: t.top, angle: t.angle || 0,
         selectable: false,
+
         evented: true,
         hasControls: false,
         hasBorders: false
@@ -165,7 +164,11 @@ export class PublicFloorPlanComponent implements AfterViewInit {
   }
 
   getZoneName(zoneId: number): string {
-    const zone = this.zones.find(z => z.id === zoneId);
+    let zone:any ;
+      this.zones().subscribe(response => {
+        if (!response.data) return;
+        zone = response.data.find(zone => zone.id === zoneId);
+      });
     return zone ? zone.name : 'Не выбрана';
   }
 

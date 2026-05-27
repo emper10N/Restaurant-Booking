@@ -5,9 +5,9 @@
       background: #f5f7fa;
       min-height: 100vh;
     }
-    /* Левая панель зон */
+
     .zones-sidebar {
-      width: 220px;
+      width: 150px;
       flex-shrink: 0;
       background: white;
       border-radius: 12px;
@@ -32,7 +32,7 @@
       font-size: 14px;
       color: #000;
     }
-    /* Основная область */
+
     .main-area {
       flex: 1;
       display: flex;

@@ -93,7 +93,6 @@ export class BookingComponent {
   })();
 
   readonly zones = computed(() => {
-    const names = new Set<string>();
     return this.api.getZones();
   });
 
