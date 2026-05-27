@@ -15,7 +15,7 @@
       <label class="col-12 sm:col-6 md:col-4">ID пользователя <input class="w-full" type="number" formControlName="userId" /></label>
       <label class="col-12 sm:col-6 md:col-4">ID стола <input class="w-full" type="number" formControlName="tableId" /></label>
       <div class="col-12 sm:col-6 md:col-4 flex align-items-end">
-        <button type="submit" class="w-full" [disabled]="loading()">{{ loading() ? '…' : 'Применить фильтры' }}</button>
+        <button type="submit" class="w-full" [disabled]="loading()">{{ loading() ? '...' : 'Применить фильтры' }}</button>
       </div>
     </div>
   </form>
@@ -48,7 +48,7 @@
             <td>№{{ item.table!.number }} ({{ item.table!.zoneName }})</td>
             <td>{{ item.guestCount }}</td>
             <td>
-              <span class="status-badge" [class]="statusClass(item.status)">{{ item.status }}</span>
+              <span class="status-badge" [class]="statusClass(item.status)">{{ visibleStatus }}</span>
             </td>
             <td>{{ item.totalServicesPrice ?? 0 }} ₽</td>
           </tr>
@@ -89,7 +89,7 @@
           <dd>{{ d.reason?.displayName }}</dd>
           <dt>Статус</dt>
           <dd>
-            <span class="status-badge" [class]="statusClass(d.status)">{{ d.status }}</span>
+            <span class="status-badge" [class]="statusClass(d.status)">{{ this.visibleStatus }}</span>
           </dd>
           <dt>Комментарий</dt>
           <dd>{{ d.comment || '—' }}</dd>

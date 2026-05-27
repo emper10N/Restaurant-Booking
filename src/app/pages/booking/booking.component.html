@@ -1,4 +1,4 @@
-<p-card header="Новое бронирование" styleClass="page-card booking-page">
+<p-card header="Бронирование столика" styleClass="page-card booking-page">
   @if (initialLoading()) {
     <p class="muted">Загрузка справочников…</p>
   }
@@ -7,11 +7,11 @@
   }
   <form [formGroup]="form" (ngSubmit)="submit()">
     <div class="grid">
-      <label class="col-12 md:col-4">
+      <label class="col-12 md:col-3">
         Дата
         <input type="date" formControlName="bookingDate" [min]="todayStr" [max]="maxDateStr" />
       </label>
-      <label class="col-12 md:col-4">
+      <label class="col-12 md:col-2">
         Время
         <select formControlName="timeStart">
           @if (timeSlots().length === 0) {
@@ -22,21 +22,12 @@
     }
         </select>
       </label>
-      <label class="col-12 md:col-4">
+      <label class="col-12 md:col-1">
         Гости
         <input type="number" formControlName="guestCount" min="1" max="20" />
       </label>
-    </div>
-    <div class="grid">
-      <div class="col-12">
-        <button type="button" class="btn-secondary w-full md:w-auto" (click)="loadTables()">
-          Показать доступные столы
-        </button>
-      </div>
-    </div>
-
-    <div class="grid">
-      <label class="col-12 md:col-6">
+    
+      <label class="col-12 md:col-3">
         Повод визита
         <select formControlName="reasonId" (change)="onReasonChange()">
           <option [value]="0">Выберите повод</option>
@@ -45,8 +36,45 @@
           }
         </select>
       </label>
-
+      <label class="col-12 md:col-3">
+        Зона
+        <select formControlName="zoneName" (change)="onZoneChange()">
+          <option value="">Все зоны</option>
+          @for (z of (zones() | async)?.data; track z) {
+            <option [value]="z.name">{{ z.name }}</option>
+          }
+        </select>
+      </label>
+    </div>
+    
+    <div class="grid">
+      <div class="col-12 md:col-4">
+        <button type="button" class="btn-secondary w-full md:w-auto" (click)="loadTables()">
+          Показать доступные столы
+        </button>
+      </div>
+    </div>
+  
+  <div class="grid">
       <label class="col-12 md:col-6">
+        Стол
+        <p-autocomplete formControlName="tableId" [dropdown]="true " [suggestions]="items" (completeMethod)="search($event)"/>
+      </label>
+    </div>
+
+  <div class="grid">
+    <div class="col-12 md:col-8" style="height: 750px;">
+        <H1>МЕСТО ДЛЯ СХЕМЫ</H1>
+    </div>
+      <label class="col-12 md:col-4">
+        @if (table; as t) {
+      <div class="table-hint">
+        <p><strong>Вместимость:</strong> {{ t.capacity }} гостей</p>
+        @if (t.locationDescription) {
+          <p><strong>Расположение:</strong> {{ t.locationDescription }}</p>
+        }
+      </div>
+    }
         Пакет услуг (необязательно)
         <select formControlName="packageId" (change)="onPackageChange()">
           <option [value]="0">Без пакета</option>
@@ -59,21 +87,15 @@
             </option>
           }
         </select>
-      </label>
-    </div>
+          <legend>Рекомендуем к этому столику и поводу</legend>
+          @if (selectedPackage(); as pkg) {
+            <p class="muted small mb-3">
+              В пакет "{{ pkg.name }}" включены услуги: {{ pkg.services?.length ?? 0 }} шт.
+            </p>
+          }
 
-    <fieldset>
-  <legend>Дополнительные услуги</legend>
-  
-  @if (selectedPackage(); as pkg) {
-    <p class="muted small mb-3">
-      В пакет "{{ pkg.name }}" включены услуги: {{ pkg.services?.length ?? 0 }} шт.
-    </p>
-    }
-  
-  <div class="grid">
     @for (service of services(); track service.id) {
-      <div class="col-12 md:col-4">
+      <div class="col-12 md:col-12">
         <div class="flex align-items-center gap-2" [class.package-service]="isPackageService(service.id)">
           <p-checkbox 
             [inputId]="'service_' + service.id"
@@ -93,42 +115,18 @@
         </div>
       </div>
     }
-  </div>
-</fieldset>
-
 
     <div class="price-summary">
       <p>
         <strong>Стоимость дополнительных услуг:</strong>
-        {{ extraServicesTotal() }} ₽
+        {{extraServicesTotal()}}₽
       </p>
     </div>
-
-    <div class="grid">
-      <label class="col-12 md:col-6">
-        Зона
-        <select formControlName="zoneName" (change)="onZoneChange()">
-          <option value="">Все зоны</option>
-          @for (z of zones(); track z) {
-            <option [value]="z">{{ z }}</option>
-          }
-        </select>
       </label>
-      
-      <label class="col-12 md:col-6">
-        Стол
-        <p-autocomplete formControlName="tableId" [dropdown]="true " [suggestions]="items" (completeMethod)="search($event)" />
-      </label>
-    </div>
 
-    @if (table; as t) {
-      <div class="table-hint">
-        <p><strong>Вместимость:</strong> {{ t.capacity }} гостей</p>
-        @if (t.locationDescription) {
-          <p><strong>Расположение:</strong> {{ t.locationDescription }}</p>
-        }
-      </div>
-    }
+  
+  
+  </div>
     <p-floatlabel>
       <textarea id="over_label" [autoResize]="true" pTextarea formControlName="comment" class="col-12 md:col-12"></textarea>
       <label for="over_label">Комментарий</label>

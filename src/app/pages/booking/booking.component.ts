@@ -9,6 +9,8 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
 import { FormsModule } from '@angular/forms';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DateService } from '../../core/services/date-service';
+import { Subject, takeUntil } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 
 interface AutoCompleteCompleteEvent {
     originalEvent: Event;
@@ -18,7 +20,7 @@ interface AutoCompleteCompleteEvent {
 @Component({
   selector: 'app-booking',
   standalone: true,
-  imports: [ReactiveFormsModule, Card, TextareaModule, FloatLabelModule, AutoCompleteModule, FormsModule, CheckboxModule],
+  imports: [ReactiveFormsModule, Card, TextareaModule, FloatLabelModule, AutoCompleteModule, FormsModule, CheckboxModule, AsyncPipe],
   templateUrl: './booking.component.html'
 })
 export class BookingComponent {
@@ -39,9 +41,11 @@ export class BookingComponent {
   readonly tablesLoading = signal(false);
   readonly submitting = signal(false);
   readonly timeSlots = signal<string[]>([]);
+  private destroy$ = new Subject<void>();
+  currentView = signal<string>('default');
   items!: any[];
   value!: any;
-  table!: any;
+  table!: TableItem | undefined;
 
   selectedServices: { [key: number]: boolean } = {};
   serviceCheckState: { [key: number]: boolean } = {};
@@ -87,10 +91,7 @@ export class BookingComponent {
 
   readonly zones = computed(() => {
     const names = new Set<string>();
-    for (const t of this.tables()) {
-      names.add(t.zoneName);
-    }
-    return [...names].sort((a, b) => a.localeCompare(b, 'ru'));
+    return this.api.getZones();
   });
 
   readonly filteredTables = computed(() => {
@@ -124,8 +125,11 @@ export class BookingComponent {
         item.number.toString().includes(query) ||
         item.zoneName.toLowerCase().includes(query)
     );
-    this.items = _items.map((item) => 
-        item.id
+    this.items = _items.map((item) => {
+      this.table = item;
+      return item.id;
+    }
+        
     );
 }
 
@@ -144,6 +148,14 @@ export class BookingComponent {
     if (initialDate) {
       this.updateTimeSlots(initialDate);
     }
+
+    this.form.get('tableId')?.valueChanges.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(type => {
+      this.table = this.tables().find((t) => t.id === type);
+      this.currentView.set(type.toString());
+    });
+
   }
 
     private updateTimeSlots(date: string) {

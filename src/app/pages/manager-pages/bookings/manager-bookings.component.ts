@@ -24,6 +24,7 @@ export class ManagerBookingsComponent {
   readonly detail = signal<Booking | null>(null);
   readonly detailLoading = signal(false);
   readonly statusUpdating = signal<number | null>(null);
+  public visibleStatus: string = '';
 
   readonly statusOptions = ['PENDING_CONFIRMATION', 'CONFIRMED', 'CANCELLED', 'COMPLETED', 'NO_SHOW'];
 
@@ -107,14 +108,19 @@ export class ManagerBookingsComponent {
   statusClass(status: string): string {
     switch (status) {
       case 'PENDING_CONFIRMATION':
+        this.visibleStatus = 'Ожидает подтверждения';
         return 'status-pending';
       case 'CONFIRMED':
+        this.visibleStatus = 'Подтверждено';
         return 'status-confirmed';
       case 'CANCELLED':
+        this.visibleStatus = 'Отменено';
         return 'status-cancelled';
       case 'COMPLETED':
+        this.visibleStatus = 'Завершено';
         return 'status-completed';
       case 'NO_SHOW':
+        this.visibleStatus ='Не явился';
         return 'status-noshow';
       default:
         return '';
