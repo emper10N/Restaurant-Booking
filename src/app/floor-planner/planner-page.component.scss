@@ -1,0 +1,32 @@
+.planner-page {
+  padding: 1rem;
+  height: calc(100vh - 70px);
+  display: flex;
+  flex-direction: column;
+  background: #f3f4f6;
+}
+
+.planner-header {
+  margin-bottom: 1rem;
+}
+
+.planner-header h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+  color: #1f2937;
+}
+
+.text-muted {
+  color: #6b7280;
+  margin-top: 0;
+}
+
+.planner-wrapper {
+  flex: 1;
+  min-height: 500px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}

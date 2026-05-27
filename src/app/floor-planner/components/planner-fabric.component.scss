@@ -1,0 +1,62 @@
+.fabric-planner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+}
+.zones-panel {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 10px;
+  h3 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+  }
+}
+.zone-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.zone-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: white;
+  border-left: 4px solid;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  &.selected {
+    background: #e0e0e0;
+    font-weight: bold;
+  }
+}
+.zone-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  input { padding: 4px; }
+}
+.assign-actions button {
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  &:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+}
+.toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}

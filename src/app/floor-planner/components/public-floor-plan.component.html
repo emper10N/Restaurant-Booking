@@ -1,0 +1,51 @@
+<div class="public-planner">
+      <!-- Левая панель с зонами -->
+      <div class="zones-sidebar">
+        <h3>Зоны</h3>
+        <div class="zone-list">
+          @for (zone of zones; track zone.id) {
+            <div class="zone-item" [style.borderLeftColor]="zone.color">
+              {{ zone.name }}
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Основная область -->
+      <div class="main-area">
+        <div class="header">
+          <h2>Схема зала</h2>
+          <div class="date-time-selector">
+            <input type="date" [(ngModel)]="selectedDateStr" (change)="reloadData()" />
+            <input type="time" [(ngModel)]="selectedTimeStr" (change)="reloadData()" />
+          </div>
+          <div class="legend">
+            <span><span class="legend-color free"></span> Свободен</span>
+            <span><span class="legend-color booked"></span> Забронирован</span>
+            <span><span class="legend-color maintenance"></span> Техобслуживание</span>
+          </div>
+        </div>
+        <div class="canvas-container">
+          <canvas #canvasEl id="publicCanvas" width="1000" height="600"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Модальное окно информации о столе -->
+    <div *ngIf="selectedTable" class="modal-overlay" (click)="closeModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <h3>Стол {{ selectedTable.data.number }}</h3>
+        <p><strong>Зона:</strong> {{ getZoneName(selectedTable.data.zoneId) }}</p>
+        <p><strong>Вместимость:</strong> {{ selectedTable.data.capacity }} гостей</p>
+        <p><strong>Описание:</strong> {{ selectedTable.data.description || 'нет' }}</p>
+        <p><strong>Статус:</strong> 
+          <span [style.color]="getStatusColor(selectedTable.data)">
+            {{ getStatusText(selectedTable.data) }}
+          </span>
+        </p>
+        <div class="modal-buttons">
+          <button (click)="bookTable()" [disabled]="selectedTable.data.booked">Забронировать</button>
+          <button (click)="closeModal()">Закрыть</button>
+        </div>
+      </div>
+    </div>

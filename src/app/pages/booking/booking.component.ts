@@ -11,6 +11,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { DateService } from '../../core/services/date-service';
 import { Subject, takeUntil } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
+import {PublicFloorPlanComponent} from '../../floor-planner/components/public-floor-plan.component';
 
 interface AutoCompleteCompleteEvent {
     originalEvent: Event;
@@ -20,7 +21,7 @@ interface AutoCompleteCompleteEvent {
 @Component({
   selector: 'app-booking',
   standalone: true,
-  imports: [ReactiveFormsModule, Card, TextareaModule, FloatLabelModule, AutoCompleteModule, FormsModule, CheckboxModule, AsyncPipe],
+  imports: [PublicFloorPlanComponent, ReactiveFormsModule, Card, TextareaModule, FloatLabelModule, AutoCompleteModule, FormsModule, CheckboxModule, AsyncPipe],
   templateUrl: './booking.component.html'
 })
 export class BookingComponent {
@@ -46,6 +47,8 @@ export class BookingComponent {
   items!: any[];
   value!: any;
   table!: TableItem | undefined;
+  date: string = "";
+  time:string = "";
 
   selectedServices: { [key: number]: boolean } = {};
   serviceCheckState: { [key: number]: boolean } = {};
@@ -208,6 +211,8 @@ export class BookingComponent {
       this.infoIsError.set(true);
       return;
     }
+    this.date = bookingDate;
+    this.time = timeStart;
     this.tablesLoading.set(true);
     this.info.set(null);
     this.api.getTables().subscribe({

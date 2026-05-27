@@ -1,0 +1,50 @@
+<div class="fabric-planner">
+  <!-- Панель зон -->
+  <div class="zones-panel">
+    <h3>Зоны</h3>
+    <div class="zone-list">
+      @for (zone of zones; track zone.id) {
+        <div 
+          class="zone-item" 
+          [style.borderLeftColor]="zone.color"
+          (click)="selectZone(zone.id)"
+          [class.selected]="selectedZoneId === zone.id"
+        >
+          {{ zone.name }}
+          <button (click)="deleteZone(zone.id); $event.stopPropagation()">🗑️</button>
+        </div>
+      }
+    </div>
+    <div class="zone-actions">
+      <input #zoneNameInput placeholder="Название зоны" />
+      <input #zoneColorInput type="color" value="#cccccc" />
+      <button (click)="addZone(zoneNameInput.value, zoneColorInput.value)">+ Добавить зону</button>
+    </div>
+    <div class="assign-actions">
+      <button (click)="assignSelectedTablesToZone()" [disabled]="selectedZoneId === null">
+        Привязать выделенные столы к выбранной зоне
+      </button>
+    </div>
+  </div>
+
+  <!-- Панель инструментов -->
+  <div class="toolbar">
+    <button (click)="addTable()">➕ Добавить стол</button>
+    <button (click)="deleteSelectedTables()">🗑️ Удалить выделенные столы</button>
+    <button (click)="clearSelection()">Снять выделение</button>
+    <button (click)="saveToLocalStorage()">💾 Сохранить схему</button>
+    <button (click)="loadFromLocalStorage()">📂 Загрузить схему</button>
+    <button (click)="exportToFile()">📄 Экспорт в файл</button>
+    <button (click)="startWallDrawing()" [class.active]="drawingMode === 'wall'">🧱 Стена</button>
+    <button (click)="cancelWallDrawing()" *ngIf="drawingMode === 'wall'">❌ Отменить рисование</button>
+  </div>
+
+  <!-- Холст с оверлеем для рисования стен -->
+  <div style="position: relative; width:1000px; height:600px;">
+    <canvas #canvasEl width="1000" height="600" style="border:1px solid #ccc; background:#f9f9f9; display:block;"></canvas>
+    <div *ngIf="drawingMode === 'wall'" 
+         (click)="onCanvasClick($event)"
+         style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:10; cursor: crosshair;">
+    </div>
+  </div>
+</div>
