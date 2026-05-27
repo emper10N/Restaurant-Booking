@@ -1,13 +1,10 @@
-import { Component, AfterViewInit, ViewChild, ElementRef, HostListener } from '@angular/core';
+import { Component, AfterViewInit, ViewChild, ElementRef, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as fabric from 'fabric';
-
-interface Zone {
-  id: number;
-  name: string;
-  color: string;
-}
+import { AppApiService } from '../../core/services/app-api.service';
+import { firstValueFrom, map } from 'rxjs';
+import { TableItem, ZoneItem } from '../../core/models/models';
 
 @Component({
   selector: 'app-planner-fabric',
@@ -19,12 +16,13 @@ interface Zone {
 export class PlannerFabricComponent implements AfterViewInit {
   @ViewChild('canvasEl') canvasRef!: ElementRef<HTMLCanvasElement>;
   private canvas!: fabric.Canvas;
-  private gridSize = 20;
+  private gridSize = 10;
+  private readonly api = inject(AppApiService);
 
-  zones: Zone[] = [];
+  zones: ZoneItem[] = [];
   selectedZoneId: number | null = null;
   private nextZoneId = 1;
-  private nextTableId = 1; // следующий свободный ID стола (без пропусков)
+  private nextTableId = 1;
 
   showAddZoneForm = false;
   newZoneName = '';
@@ -37,12 +35,17 @@ export class PlannerFabricComponent implements AfterViewInit {
   editTableStatus: 'free' | 'booked' | 'maintenance' = 'free';
   private originalTableStatus: 'free' | 'booked' | 'maintenance' = 'free';
 
-  editingZone: Zone | null = null;
+  editingZone: ZoneItem | null = null;
   editZoneName: string = '';
   editZoneColor: string = '';
 
   private copiedTableData: any = null;
   private angleIndicator: any = null;
+  tables: any;
+
+  ngOnInit(){
+    this.loadData();
+  }
 
   get statusChanged(): boolean {
     return this.editingTable && this.editTableStatus !== this.originalTableStatus;
@@ -50,7 +53,7 @@ export class PlannerFabricComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.canvas = new fabric.Canvas(this.canvasRef.nativeElement);
-    (this.canvas as any).setDimensions({ width: 1000, height: 600 });
+    (this.canvas as any).setDimensions({ width: 650, height: 700 });
     this.canvas.setZoom(1);
     this.drawGrid();
     this.enableSnapToGrid();
@@ -62,6 +65,17 @@ export class PlannerFabricComponent implements AfterViewInit {
     this.snapAllTablesToGrid();
     this.canvas.renderAll();
   }
+
+    private async loadData(): Promise<void> {
+      try {
+        const zonesResponse = await firstValueFrom(
+          this.api.getZones().pipe(map(response => response.data))
+        );
+        this.zones = zonesResponse ?? [];
+      } catch (error) {
+        console.error('Ошибка загрузки схемы', error);
+      }
+    }
 
   private snapAllTablesToGrid(): void {
     const tables = this.getTablesOnCanvas();
@@ -252,19 +266,8 @@ export class PlannerFabricComponent implements AfterViewInit {
     return this.canvas.getObjects().filter(obj => obj.type === 'group' && (obj as any).data?.type === 'table');
   }
 
-  // ========== Зоны ==========
   addZone(name?: string, color?: string): void {
-    if (name !== undefined && color !== undefined) {
-      const newZone: Zone = { id: this.nextZoneId++, name: name.trim(), color };
-      this.zones.push(newZone);
-      if (this.zones.length === 1) this.selectedZoneId = newZone.id;
-      return;
-    }
-    if (!this.newZoneName.trim()) {
-      alert('Введите название зоны');
-      return;
-    }
-    const newZone: Zone = { id: this.nextZoneId++, name: this.newZoneName.trim(), color: this.newZoneColor };
+    const newZone: ZoneItem = { id: this.nextZoneId++, name: this.newZoneName.trim(), active: true, tableCount: 0};
     this.zones.push(newZone);
     if (this.zones.length === 1) this.selectedZoneId = newZone.id;
     this.newZoneName = '';
@@ -278,16 +281,14 @@ export class PlannerFabricComponent implements AfterViewInit {
     this.newZoneColor = '#cccccc';
   }
 
-  editZone(zone: Zone): void {
+  editZone(zone: ZoneItem): void {
     this.editingZone = zone;
     this.editZoneName = zone.name;
-    this.editZoneColor = zone.color;
   }
 
   saveZoneEdit(): void {
     if (!this.editingZone) return;
     this.editingZone.name = this.editZoneName;
-    this.editingZone.color = this.editZoneColor;
     const tables = this.getTablesOnCanvas();
     for (const table of tables) {
       if (table.data.zoneId === this.editingZone.id) {
@@ -328,7 +329,6 @@ export class PlannerFabricComponent implements AfterViewInit {
     return zone ? zone.name : 'Не выбрана';
   }
 
-  // ========== Столы ==========
   addTable(): void {
     if (this.zones.length === 0) {
       alert('Сначала создайте хотя бы одну зону');
@@ -362,7 +362,7 @@ export class PlannerFabricComponent implements AfterViewInit {
 
   private addTableAt(left: number, top: number, customData?: any): any {
     const zone = this.zones.find(z => z.id === (customData?.zoneId || this.selectedZoneId));
-    const strokeColor = zone ? zone.color : '#999';
+    const strokeColor = '#999';
     let tableId = customData?.tableId;
     if (!tableId) {
       tableId = this.nextTableId;
@@ -497,7 +497,6 @@ export class PlannerFabricComponent implements AfterViewInit {
       });
       this.canvas.discardActiveObject();
       this.canvas.renderAll();
-      // После удаления обновляем nextTableId (чтобы при создании нового стола номер шёл без пропусков)
       this.updateNextTableId();
     }
   }
@@ -511,7 +510,7 @@ export class PlannerFabricComponent implements AfterViewInit {
     for (const t of tables) {
       t.data.zoneId = this.selectedZoneId;
       const rect = (t as any).getObjects()[0] as fabric.Rect;
-      rect.set('stroke', newZone.color);
+      rect.set('stroke', '#cccccc');
     }
     this.canvas.discardActiveObject();
     this.canvas.renderAll();
@@ -578,70 +577,7 @@ export class PlannerFabricComponent implements AfterViewInit {
     alert('Схема сохранена');
   }
 
-  loadFromLocalStorage(): void {
-    const saved = localStorage.getItem('floor_plan');
-    if (!saved) { alert('Нет сохранённой схемы'); return; }
-    try {
-      const state = JSON.parse(saved);
-      this.zones = state.zones;
-      this.nextZoneId = Math.max(0, ...this.zones.map(z => z.id), 0) + 1;
-      this.selectedZoneId = this.zones.length ? this.zones[0].id : null;
-      const gridLines = this.canvas.getObjects().filter((obj: any) => obj.data?.isGridLine);
-      this.canvas.clear();
-      gridLines.forEach(line => this.canvas.add(line));
-      let maxTableId = 0;
-      for (const t of (state.tables || [])) {
-        const zone = this.zones.find(z => z.id === t.zoneId);
-        const strokeColor = zone ? zone.color : '#999';
-        const statusColor = t.status === 'free' ? '#d4edda' : t.status === 'booked' ? '#f8d7da' : '#fff3cd';
-        const rect = new fabric.Rect({
-          width: t.width || 60,
-          height: t.height || 60,
-          fill: statusColor,
-          stroke: strokeColor,
-          strokeWidth: 3,
-          rx: 6, ry: 6,
-          lockScalingX: false, lockScalingY: true
-        });
-        const group = new fabric.Group([rect], {
-          left: t.left, top: t.top, angle: t.angle || 0, hasControls: true,
-          lockScalingX: false, lockScalingY: true
-        });
-        group.data = {
-          tableId: t.tableId,
-          zoneId: t.zoneId,
-          type: 'table',
-          number: t.number,
-          capacity: t.capacity,
-          description: t.description,
-          status: t.status
-        };
-        const textObj = new fabric.Text(t.number || t.tableId.toString(), {
-          fontSize: 14,
-          fill: '#000',
-          fontWeight: 'bold',
-          originX: 'center',
-          originY: 'center',
-          selectable: false,
-          evented: false
-        });
-        (group as any).textObj = textObj;
-        this.canvas.add(group);
-        this.canvas.add(textObj);
-        this.updateTableTextPosition(group);
-        this.snapToGrid(group);
-        if (t.tableId > maxTableId) maxTableId = t.tableId;
-      }
-      for (const txt of (state.texts || [])) {
-        const textObj = new fabric.IText(txt.text, { left: txt.left, top: txt.top, fontSize: txt.fontSize || 20, fill: txt.fill || '#000', editable: true });
-        textObj.data = { type: 'text' };
-        this.canvas.add(textObj);
-      }
-      this.nextTableId = maxTableId + 1;
-      this.canvas.renderAll();
-      alert('Схема загружена');
-    } catch(e) { console.error(e); alert('Ошибка загрузки'); }
-  }
+
 
   exportToFile(): void {
     const tablesData = this.getTablesOnCanvas().map(table => {
@@ -687,4 +623,69 @@ export class PlannerFabricComponent implements AfterViewInit {
       this.deleteSelected();
     }
   }
+
+    getTables(zone: ZoneItem){
+      let tableList: TableItem[] = [];
+      for(let table of this.tables!){
+        if(table.zoneId === zone.id){
+          tableList.push(table)
+        }
+      }
+      this.canvas.clear();
+      this.drawGrid();
+      this.renderTables(tableList);
+      this.canvas.renderAll();
+    }
+
+    private renderTables(tables: TableItem[] | null): void {
+        
+        if (!tables || tables.length === 0) return;
+        
+        tables.forEach((t, index) => {
+          const strokeColor = '#999';
+          let fillColor = '#00ff3c';
+          if (!t.active) fillColor = '#f8d7da';
+          
+          const rect = new fabric.Rect({
+            width: 50,
+            height: 50,
+            fill: fillColor,
+            stroke: strokeColor,
+            strokeWidth: 3,
+            rx: 6,
+            ry: 6,
+            selectable: false,
+            evented: true
+          });
+          
+          const text = new fabric.Text(String(t.number), {
+            fontSize: 14,
+            fill: '#000000',
+            fontWeight: 'bold',
+            originX: 'center',
+            originY: 'center',
+            selectable: false,
+            evented: false
+          });
+          
+          const col = index % 5;
+          const row = Math.floor(index / 5);
+          const spacing = 70;
+          
+          const group = new fabric.Group([rect, text], {
+            left: col * spacing + 50,
+            top: row * spacing + 50,
+            angle: 0,
+            selectable: false,
+            evented: true,
+            hasControls: false,
+            hasBorders: false,
+          });
+          group.data = t;
+          
+          this.canvas.add(group);
+        });
+        
+        this.canvas.renderAll();
+    }
 }

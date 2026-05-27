@@ -6,7 +6,6 @@
             @for (zone of zones; track zone.id) {
               <div 
                 class="zone-item" 
-                [style.borderLeftColor]="zone.color"
                 [class.selected]="selectedZoneId === zone.id"
                 (click)="selectZone(zone.id)"
               >
@@ -44,9 +43,7 @@
         <div class="toolbar">
           <div class="tool-group">
             <button (click)="addTable()" [disabled]="zones.length === 0"><i class="fas fa-table"></i> Стол</button>
-            <button (click)="addText()"><i class="fas fa-font"></i> Текст</button>
             <button (click)="deleteSelected()"><i class="fas fa-trash"></i> Удалить</button>
-            <button (click)="clearSelection()"><i class="fas fa-arrow-pointer"></i> Снять</button>
           </div>
           <div class="tool-group">
             <button (click)="clearAll()"><i class="fas fa-broom"></i> Очистить всё</button>
@@ -54,7 +51,6 @@
           <div class="tool-group">
             <button (click)="exportToPNG()"><i class="fas fa-camera"></i> PNG</button>
             <button (click)="saveToLocalStorage()"><i class="fas fa-save"></i> Сохранить</button>
-            <button (click)="loadFromLocalStorage()"><i class="fas fa-folder-open"></i> Загрузить</button>
             <button (click)="exportToFile()"><i class="fas fa-file-export"></i> Экспорт</button>
           </div>
         </div>
@@ -65,7 +61,6 @@
       </div>
     </div>
 
-    <!-- Модальные окна -->
     <div *ngIf="editingTable" class="modal-overlay" (click)="closeModal()">
       <div class="modal-content" (click)="$event.stopPropagation()">
         <h3>Редактирование стола</h3>
@@ -75,13 +70,6 @@
         <input type="number" min="1" max="30" [(ngModel)]="editTableCapacity" (change)="updateTableSizeFromCapacity()" />
         <label>Описание:</label>
         <textarea rows="3" [(ngModel)]="editTableDescription"></textarea>
-        <label>Статус:</label>
-        <select [(ngModel)]="editTableStatus">
-          <option value="free">Свободен</option>
-          <option value="booked">Забронирован</option>
-          <option value="maintenance">Техобслуживание</option>
-        </select>
-        <div *ngIf="statusChanged" class="status-warning">⚠️ Изменение статуса может повлиять на бронирования!</div>
         <label>Зона:</label>
         <input [value]="getZoneNameForTable()" disabled />
         <div class="modal-buttons">

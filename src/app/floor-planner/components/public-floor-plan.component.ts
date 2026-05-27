@@ -118,13 +118,13 @@ export class PublicFloorPlanComponent implements AfterViewInit {
         evented: false
       });
       
-      const col = index % 5;
-      const row = Math.floor(index / 5);
-      const spacing = 70;
+      const col = index % 10;
+      const row = Math.floor(index / 10);
+      const spacing = 100;
       
       const group = new fabric.Group([rect, text], {
-        left: col * spacing + 50,
-        top: row * spacing + 50,
+        left: col * spacing + 70,
+        top: row * spacing + 70,
         angle: 0,
         selectable: false,
         evented: true,

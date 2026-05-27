@@ -3,11 +3,12 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Card } from 'primeng/card';
 import { AppApiService } from '../../../core/services/app-api.service';
 import { TableItem, ZoneItem } from '../../../core/models/models';
+import { PlannerFabricComponent } from '../../../floor-planner/components/planner-fabric.component';
 
 @Component({
   selector: 'app-admin-tables',
   standalone: true,
-  imports: [ReactiveFormsModule, Card],
+  imports: [ReactiveFormsModule, Card, PlannerFabricComponent],
   templateUrl: './admin-tables.component.html'
 })
 export class AdminTablesComponent {
@@ -16,7 +17,6 @@ export class AdminTablesComponent {
   readonly zones = signal<ZoneItem[]>([]);
   readonly tables = signal<TableItem[]>([]);
   
-  // Добавьте сигналы для уведомлений
   readonly info = signal<string | null>(null);
   readonly infoIsError = signal(false);
 
