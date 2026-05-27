@@ -6,6 +6,11 @@ import { AppApiService } from '../../../core/services/app-api.service';
 import { Booking } from '../../../core/models/models';
 import { AuthService } from '../../../core/services/auth.service';
 
+export interface IStatus{
+  ru: string,
+  eu:string
+}
+
 @Component({
   selector: 'app-manager-bookings',
   standalone: true,
@@ -26,7 +31,12 @@ export class ManagerBookingsComponent {
   readonly statusUpdating = signal<number | null>(null);
   public visibleStatus: string = '';
 
-  readonly statusOptions = ['PENDING_CONFIRMATION', 'CONFIRMED', 'CANCELLED', 'COMPLETED', 'NO_SHOW'];
+  readonly statusOptions: IStatus[] = [{ru:'Ожидает подтверждения', eu: 'PENDING_CONFIRMATION'},
+    {ru:'Подтверждено', eu: 'CONFIRMED'},
+    {ru:'Отменено', eu: 'CANCELLED'},
+    {ru:'Завершено', eu: 'COMPLETED'},
+    {ru:'Не явился', eu: 'NO_SHOW'}
+  ];
 
   readonly adminQuickActions: Array<{ label: string; status: string; variant: string }> = [
     { label: 'Подтвердить', status: 'CONFIRMED', variant: 'confirm' },
