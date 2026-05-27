@@ -2,15 +2,14 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Card } from 'primeng/card';
 import { AppApiService } from '../../core/services/app-api.service';
-import { PackageItem, SelectItem, ServiceItem, TableItem } from '../../core/models/models';
+import { PackageItem, SelectItem, ServiceItem, TableItem, ZoneItem } from '../../core/models/models';
 import { TextareaModule } from 'primeng/textarea';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { FormsModule } from '@angular/forms';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DateService } from '../../core/services/date-service';
-import { Subject, takeUntil } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
+import { Subject } from 'rxjs';
 import {PublicFloorPlanComponent} from '../../floor-planner/components/public-floor-plan.component';
 
 interface AutoCompleteCompleteEvent {
@@ -21,7 +20,7 @@ interface AutoCompleteCompleteEvent {
 @Component({
   selector: 'app-booking',
   standalone: true,
-  imports: [PublicFloorPlanComponent, ReactiveFormsModule, Card, TextareaModule, FloatLabelModule, AutoCompleteModule, FormsModule, CheckboxModule, AsyncPipe],
+  imports: [PublicFloorPlanComponent, ReactiveFormsModule, Card, TextareaModule, FloatLabelModule, AutoCompleteModule, FormsModule, CheckboxModule],
   templateUrl: './booking.component.html'
 })
 export class BookingComponent {
@@ -32,7 +31,6 @@ export class BookingComponent {
   readonly reasons = signal<SelectItem[]>([]);
   readonly services = signal<ServiceItem[]>([]);
   readonly packages = signal<PackageItem[]>([]);
-  readonly tables = signal<TableItem[]>([]);
   readonly info = signal<string | null>(null);
   readonly infoIsError = signal(false);
   readonly selectedServiceIds = signal<number[]>([]);
@@ -46,9 +44,10 @@ export class BookingComponent {
   currentView = signal<string>('default');
   items!: any[];
   value!: any;
-  table!: TableItem | undefined;
+  table!: TableItem;
   date: string = "";
   time:string = "";
+  zone!: ZoneItem;
 
   selectedServices: { [key: number]: boolean } = {};
   serviceCheckState: { [key: number]: boolean } = {};
@@ -92,17 +91,6 @@ export class BookingComponent {
     return d.toISOString().slice(0, 10);
   })();
 
-  readonly zones = computed(() => {
-    return this.api.getZones();
-  });
-
-  readonly filteredTables = computed(() => {
-    const zone = this.form.controls.zoneName.value;
-    const list = this.tables();
-    if (!zone) return list;
-    return list.filter((t) => t.zoneName === zone);
-  });
-
   readonly extraServicesTotal = computed(() => {
     const pkgIds = this.packageServiceIds();
     return this.services()
@@ -121,20 +109,10 @@ export class BookingComponent {
     comment: ['', Validators.maxLength(500)]
   });
 
-  search(event: AutoCompleteCompleteEvent) {
-    const query = event.query.toLowerCase();
-    let _items = this.filteredTables().filter(item => 
-        item.number.toString().includes(query) ||
-        item.zoneName.toLowerCase().includes(query)
-    );
-    this.items = _items.map((item) => {
-      this.table = item;
-      return item.id;
-    }
-        
-    );
-}
-
+    onTableSelected(table: TableItem) {
+      this.table = table;
+      this.form.controls.tableId.setValue(this.table.id);
+    } 
   constructor() {
     this.loadInitialData();
   }
@@ -150,14 +128,6 @@ export class BookingComponent {
     if (initialDate) {
       this.updateTimeSlots(initialDate);
     }
-
-    this.form.get('tableId')?.valueChanges.pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(type => {
-      this.table = this.tables().find((t) => t.id === type);
-      this.currentView.set(type.toString());
-    });
-
   }
 
     private updateTimeSlots(date: string) {
@@ -177,7 +147,6 @@ export class BookingComponent {
     }
   }
   
-  // При изменении даты вручную
   onDateChange() {
     const date = this.form.controls.bookingDate.value;
     if (date) {
@@ -188,43 +157,6 @@ export class BookingComponent {
         this.infoIsError.set(true);
       }
     }
-  }
-
-  loadTables() {
-    const { bookingDate, timeStart, guestCount } = this.form.getRawValue();
-    if (!bookingDate || !timeStart || !guestCount) {
-      this.info.set('Укажите дату, время и число гостей');
-      this.infoIsError.set(true);
-      return;
-    }
-    const d = new Date(bookingDate + 'T00:00:00');
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (d < today) {
-      this.info.set('Дата не может быть в прошлом');
-      this.infoIsError.set(true);
-      return;
-    }
-    if (bookingDate > this.maxDateStr) {
-      this.info.set('Дата не может быть позже чем через 3 месяца');
-      this.infoIsError.set(true);
-      return;
-    }
-    this.date = bookingDate;
-    this.time = timeStart;
-    this.tablesLoading.set(true);
-    this.info.set(null);
-    this.api.getTables().subscribe({
-      next: (res) => {
-        this.tables.set(res.data ?? []);
-        this.tablesLoading.set(false);
-      },
-      error: (err) => {
-        this.tablesLoading.set(false);
-        this.info.set(err?.error?.message ?? 'Не удалось загрузить столы');
-        this.infoIsError.set(true);
-      }
-    });
   }
 
   onReasonChange() {
@@ -283,24 +215,21 @@ export class BookingComponent {
   this.selectedServiceIds.set([...currentSelected]);
 }
 
-  onZoneChange() {
-    this.form.patchValue({ tableId: 0 });
-  }
-
   submit() {
     this.info.set(null);
     this.infoIsError.set(false);
+    this.form.controls.tableId.setValue(this.table.id);
     if (this.form.invalid) {
+      console.log(this.form.getRawValue());
       this.form.markAllAsTouched();
       this.info.set('Проверьте обязательные поля');
       this.infoIsError.set(true);
       return;
     }
     const data = this.form.getRawValue();
-    let id = this.form.get('tableId')!.value;
-    this.table = this.tables().find((t) => t.id === id);
       
     if (!this.table) {
+      console.log(!this.table)
       this.info.set('Выберите стол из списка доступных');
       this.infoIsError.set(true);
       return;
@@ -358,5 +287,10 @@ export class BookingComponent {
       error: () => done()
     });
     this.form.patchValue({ bookingDate: this.todayStr, timeStart: this.dateService.generateFutureTimeSlots(this.todayStr)[0] });
+  }
+
+  onZoneSelected(zone: ZoneItem){
+    this.zone = zone;
+    this.form.controls.zoneName.setValue(this.zone.name);
   }
 }

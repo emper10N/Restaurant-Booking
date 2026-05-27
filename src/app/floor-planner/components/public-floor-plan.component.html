@@ -2,14 +2,13 @@
       <div class="zones-sidebar">
         <h3>Зоны</h3>
         <div class="zone-list">
-          @for (zone of (zones() | async)?.data; track zone.id) {
+          @for (zone of zones; track zone.id) {
             <div class="zone-item">
-              {{ zone.name }}
+              <button (click)="getTables(zone)" type="button">{{ zone.name }}</button>
             </div>
           }
         </div>
       </div>
-
 
       <div class="main-area">
         <div class="header">
@@ -23,24 +22,6 @@
         </div>
         <div class="canvas-container">
           <canvas #canvasEl id="publicCanvas" width="400" height="600"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <div *ngIf="selectedTable" class="modal-overlay" (click)="closeModal()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <h3>Стол {{ selectedTable.data.number }}</h3>
-        <p><strong>Зона:</strong> {{ getZoneName(selectedTable.data.zoneId) }}</p>
-        <p><strong>Вместимость:</strong> {{ selectedTable.data.capacity }} гостей</p>
-        <p><strong>Описание:</strong> {{ selectedTable.data.description || 'нет' }}</p>
-        <p><strong>Статус:</strong> 
-          <span [style.color]="getStatusColor(selectedTable.data)">
-            {{ getStatusText(selectedTable.data) }}
-          </span>
-        </p>
-        <div class="modal-buttons">
-          <button (click)="bookTable()" [disabled]="selectedTable.data.booked">Забронировать</button>
-          <button (click)="closeModal()">Закрыть</button>
         </div>
       </div>
     </div>

@@ -1,24 +1,10 @@
-import { Component, AfterViewInit, ViewChild, ElementRef, input, Input, Signal } from '@angular/core';
+import { Component, AfterViewInit, ViewChild, ElementRef, input, Input, Signal, inject, Output, EventEmitter } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ApiResponse, ZoneItem } from '../../core/models/models';
+import { TableItem, ZoneItem } from '../../core/models/models';
+import { firstValueFrom, map } from 'rxjs';
+import { AppApiService } from '../../core/services/app-api.service';
 import * as fabric from 'fabric';
-import { Observable } from 'rxjs';
-
-interface TableData {
-  tableId: number;
-  zoneId: number;
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-  angle: number;
-  number: string;
-  capacity: number;
-  description: string;
-  status: string; // free, booked, maintenance
-  booked: boolean; // реальный статус брони на выбранное время
-}
 
 @Component({
   selector: 'app-public-floor-plan',
@@ -31,62 +17,60 @@ interface TableData {
 export class PublicFloorPlanComponent implements AfterViewInit {
   @ViewChild('canvasEl') canvasRef!: ElementRef<HTMLCanvasElement>;
   private canvas!: fabric.Canvas;
-  @Input()
-  zones!: Signal<Observable<ApiResponse<ZoneItem[]>>>;
-  private tables: TableData[] = [];
-  private gridSize = 20;
-
-  selectedTable: any = null;
+  zones: ZoneItem[] | null= [];
+  @Output()
+  zone = new EventEmitter<ZoneItem>();
+  tables: TableItem[] | null = [];
+  private gridSize = 10;
+  private readonly api = inject(AppApiService);
+  @Output()
+  selectedTable = new EventEmitter<TableItem>();
   @Input()
   selectedDateStr!: string;
   @Input()
   selectedTimeStr!: string;
 
-  constructor(private datePipe: DatePipe) {}
+  constructor() {}
+
+  ngOnInit(){
+    this.loadData();
+  }
 
   ngAfterViewInit(): void {
     this.canvas = new fabric.Canvas(this.canvasRef.nativeElement);
-    (this.canvas as any).setDimensions({ width: 410, height: 610 });
+    (this.canvas as any).setDimensions({ width: 400, height: 500 });
     this.canvas.setZoom(1);
     this.canvas.selection = false;
     this.canvas.defaultCursor = 'pointer';
     this.canvas.on('mouse:down', (e: any) => {
-      const target = e.target;
-      if (target && target.type === 'group' && target.data?.type === 'table') {
-        this.showTableInfo(target);
-      }
+      const target = e.target.data;
+      this.showTableInfo(target);
     });
-    this.loadData();
+    this.render();
   }
 
   private async loadData(): Promise<void> {
     try {
-      // Здесь должен быть реальный вызов API
-      // const response = await this.floorPlanApi.getPublic(this.selectedDateStr, this.selectedTimeStr).toPromise();
-      // this.zones = response.zones;
-      // this.tables = response.tables; // tables уже содержат поле booked
-      // Пока используем демо-данные
-      // Имитация бронирований: для текущего времени считаем, что стол 2 забронирован
-      const isBooked = (tableId: number) => {
-        // здесь должна быть логика на основе реальных броней
-        return tableId === 2;
-      };
-      this.tables = [
-        { tableId: 1, zoneId: 1, left: 200, top: 150, width: 80, height: 60, angle: 0,
-          number: '1', capacity: 4, description: 'У окна', status: 'free', booked: isBooked(1) },
-        { tableId: 2, zoneId: 2, left: 400, top: 300, width: 120, height: 60, angle: 0,
-          number: '2', capacity: 6, description: 'VIP зона', status: 'free', booked: isBooked(2) }
-      ];
+      const tablesResponse = await firstValueFrom(
+        this.api.getTables().pipe(map(response => response.data))
+      );
+      this.tables = tablesResponse ?? [];
+      
+      const zonesResponse = await firstValueFrom(
+        this.api.getZones().pipe(map(response => response.data))
+      );
+      this.zones = zonesResponse ?? [];
+
+      this.render();
+      
     } catch (error) {
       console.error('Ошибка загрузки схемы', error);
     }
-    this.render();
-  }
+}
 
   private render(): void {
     this.canvas.clear();
     this.drawGrid();
-    this.renderTables();
     this.canvas.renderAll();
   }
 
@@ -103,84 +87,75 @@ export class PublicFloorPlanComponent implements AfterViewInit {
     }
   }
 
-  private renderTables(): void {
-    for (const t of this.tables) {
-
-      let zone:any ;
-      this.zones().subscribe(response => {
-        if (!response.data) return;
-        zone = response.data.find(zone => zone.id === t.zoneId);
-      });
+  private renderTables(tables: TableItem[] | null): void {
+    
+    if (!tables || tables.length === 0) return;
+    
+    tables.forEach((t, index) => {
       const strokeColor = '#999';
-      let fillColor = '#d4edda'; // свободен
-      if (t.booked) fillColor = '#f8d7da';
-      else if (t.status === 'maintenance') fillColor = '#fff3cd';
+      let fillColor = '#00ff3c';
+      if (!t.active) fillColor = '#f8d7da';
+      
       const rect = new fabric.Rect({
-        width: t.width, height: t.height,
+        width: 50,
+        height: 50,
         fill: fillColor,
         stroke: strokeColor,
         strokeWidth: 3,
-        rx: 6, ry: 6,
+        rx: 6,
+        ry: 6,
         selectable: false,
         evented: true
       });
-      const text = new fabric.Text(t.number, {
+      
+      const text = new fabric.Text(String(t.number), {
         fontSize: 14,
-        fill: '#000',
+        fill: '#000000',
         fontWeight: 'bold',
         originX: 'center',
         originY: 'center',
         selectable: false,
         evented: false
       });
+      
+      const col = index % 5;
+      const row = Math.floor(index / 5);
+      const spacing = 70;
+      
       const group = new fabric.Group([rect, text], {
-        left: t.left, top: t.top, angle: t.angle || 0,
+        left: col * spacing + 50,
+        top: row * spacing + 50,
+        angle: 0,
         selectable: false,
-
         evented: true,
         hasControls: false,
-        hasBorders: false
+        hasBorders: false,
       });
-      group.data = {
-        tableId: t.tableId,
-        zoneId: t.zoneId,
-        type: 'table',
-        number: t.number,
-        capacity: t.capacity,
-        description: t.description,
-        status: t.status,
-        booked: t.booked
-      };
+      group.data = t;
+      
       this.canvas.add(group);
-    }
-  }
+    });
+    
+    this.canvas.renderAll();
+}
 
   private showTableInfo(group: any): void {
-    this.selectedTable = group;
-  }
-
-  closeModal(): void {
-    this.selectedTable = null;
+    this.selectedTable.emit(group);
   }
 
   getZoneName(zoneId: number): string {
-    let zone:any ;
-      this.zones().subscribe(response => {
-        if (!response.data) return;
-        zone = response.data.find(zone => zone.id === zoneId);
-      });
+    let zone = this.zones!.find(zone => zone.id === zoneId)
+    this.zone.emit(zone);
     return zone ? zone.name : 'Не выбрана';
   }
 
-  getStatusText(table: any): string {
-    if (table.booked) return 'Забронирован';
-    if (table.status === 'maintenance') return 'Техобслуживание';
-    return 'Свободен';
+  getStatusText(table: TableItem): string {
+    if (table.active) return 'Свободен';
+    return 'Занят'
   }
 
-  getStatusColor(table: any): string {
-    if (table.booked) return '#b91c1c';
-    if (table.status === 'maintenance') return '#ea580c';
+  getStatusColor(table: TableItem): string {
+    if (!table.active) return '#ea580c';
     return '#15803d';
   }
 
@@ -188,13 +163,17 @@ export class PublicFloorPlanComponent implements AfterViewInit {
     this.loadData();
   }
 
-  bookTable(): void {
-    if (this.selectedTable && !this.selectedTable.data.booked) {
-      // Перенаправляем на страницу бронирования с предзаполненным столом и датой/временем
-      const tableId = this.selectedTable.data.tableId;
-      // Используйте роутер для навигации
-      alert(`Перейти к бронированию стола ${this.selectedTable.data.number}`);
-      // this.router.navigate(['/booking'], { queryParams: { tableId, date: this.selectedDateStr, time: this.selectedTimeStr } });
+  getTables(zone: ZoneItem){
+    this.zone.emit(zone);
+    let tableList: TableItem[] = [];
+    for(let table of this.tables!){
+      if(table.zoneId === zone.id){
+        tableList.push(table)
+      }
     }
+    this.canvas.clear();
+    this.drawGrid();
+    this.renderTables(tableList);
+    this.canvas.renderAll();
   }
 }
