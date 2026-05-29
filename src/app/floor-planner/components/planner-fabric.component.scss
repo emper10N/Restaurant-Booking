@@ -1,201 +1,201 @@
 .fabric-planner {
-      display: flex;
-      gap: 20px;
-      padding: 20px;
-      background: #f0f2f5;
-      min-height: 100vh;
-    }
-    .left-panel {
-      width: 280px;
-      flex-shrink: 0;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      padding: 20px;
-    }
-    .zones-panel h3 {
-      margin: 0 0 16px 0;
-      font-size: 18px;
-      color: #1f2937;
-    }
-    .zone-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 20px;
-      max-height: 300px;
-      overflow-y: auto;
-    }
-    .zone-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 12px;
-      background: #f9fafb;
-      border-left: 4px solid;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .zone-item.selected {
-      background: #e0e7ff;
-      font-weight: 500;
-    }
-    .zone-name {
-      flex: 1;
-      color: #1f2937;
-    }
-    .zone-actions-buttons {
-      display: flex;
-      gap: 6px;
-    }
-    .zone-actions-buttons button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
-      opacity: 0.7;
-      color: #1f2937;
-    }
-    .zone-actions-buttons button i {
-      color: #1f2937;
-    }
-    .zone-add {
-      margin-bottom: 16px;
-    }
-    .zone-add > button {
-      background: #3b82f6;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      width: 100%;
-    }
-    .zone-add-form {
-      margin-top: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .color-picker-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .color-label {
-      font-size: 14px;
-      color: #1f2937;
-    }
-    .zone-add-form input[type="text"] {
-      padding: 6px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      width: 100%;
-    }
-    .zone-add-form input[type="color"] {
-      width: 40px;
-      height: 30px;
-    }
-    .form-buttons {
-      display: flex;
-      gap: 8px;
-      justify-content: flex-end;
-    }
-    .form-buttons button {
-      background: #3b82f6;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .assign-actions button {
-      background: #4caf50;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      width: 100%;
-    }
-    .assign-actions button:disabled {
-      background: #9ca3af;
-    }
-    .main-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-    }
-    .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      background: white;
-      padding: 12px 16px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .tool-group {
-      display: flex;
-      gap: 6px;
-      border-right: 1px solid #e5e7eb;
-      padding-right: 12px;
-      margin-right: 6px;
-    }
-    .tool-group:last-child {
-      border-right: none;
-      padding-right: 0;
-      margin-right: 0;
-    }
-    .toolbar button {
-      background: #f3f4f6;
-      border: 1px solid #d1d5db;
-      padding: 6px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: #1f2937;
-    }
-    .toolbar button i {
-      color: #1f2937;
-    }
-    .toolbar button:hover {
-      background: #e5e7eb;
-    }
-    .toolbar button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .canvas-wrapper {
-      background: white;
-      border-radius: 12px;
-      padding: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      display: inline-block;
-    }
-    #floorCanvas {
-      border: 1px solid #ddd;
-      background: #f9f9f9;
-      display: block;
-    }
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-    .modal-content {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  background: #f0f2f5;
+  min-height: 100vh;
+}
+.left-panel {
+  width: 280px;
+  flex-shrink: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+.zones-panel h3 {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  color: #1f2937;
+}
+.zone-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.zone-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #f9fafb;
+  border-left: 4px solid;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.zone-item.selected {
+  background: #e0e7ff;
+  font-weight: 500;
+}
+.zone-name {
+  flex: 1;
+  color: #1f2937;
+}
+.zone-actions-buttons {
+  display: flex;
+  gap: 6px;
+}
+.zone-actions-buttons button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.7;
+  color: #1f2937;
+}
+.zone-actions-buttons button i {
+  color: #1f2937;
+}
+.zone-add {
+  margin-bottom: 16px;
+}
+.zone-add > button {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+}
+.zone-add-form {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.color-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.color-label {
+  font-size: 14px;
+  color: #1f2937;
+}
+.zone-add-form input[type="text"] {
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+}
+.zone-add-form input[type="color"] {
+  width: 40px;
+  height: 30px;
+}
+.form-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.form-buttons button {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.assign-actions button {
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+}
+.assign-actions button:disabled {
+  background: #9ca3af;
+}
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: white;
+  padding: 12px 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.tool-group {
+  display: flex;
+  gap: 6px;
+  border-right: 1px solid #e5e7eb;
+  padding-right: 12px;
+  margin-right: 6px;
+}
+.tool-group:last-child {
+  border-right: none;
+  padding-right: 0;
+  margin-right: 0;
+}
+.toolbar button {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #1f2937;
+}
+.toolbar button i {
+  color: #1f2937;
+}
+.toolbar button:hover {
+  background: #e5e7eb;
+}
+.toolbar button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.canvas-wrapper {
+  background: white;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+}
+#floorCanvas {
+  border: 1px solid #ddd;
+  background: #f9f9f9;
+  display: block;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-content {
   background: white;
   padding: 24px;
   border-radius: 12px;
@@ -210,8 +210,8 @@
   font-weight: 500;
   color: #000; /* добавить эту строку */
 }
-.modal-content input, 
-.modal-content textarea, 
+.modal-content input,
+.modal-content textarea,
 .modal-content select {
   width: 100%;
   padding: 8px;
@@ -225,31 +225,31 @@
   color: #000; /* добавить эту строку */
   margin: 0 0 16px 0;
 }
-    .status-warning {
-      color: #dc2626;
-      font-size: 12px;
-      margin-top: 6px;
-      background: #fee2e2;
-      padding: 4px;
-      border-radius: 4px;
-    }
-    .modal-buttons {
-      display: flex;
-      gap: 12px;
-      margin-top: 20px;
-      justify-content: flex-end;
-    }
-    .modal-buttons button {
-      padding: 6px 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .modal-buttons button:first-child {
-      background: #3b82f6;
-      color: white;
-    }
-    .modal-buttons button:last-child {
-      background: #e5e7eb;
-      color: #1f2937;
-    }
+.status-warning {
+  color: #dc2626;
+  font-size: 12px;
+  margin-top: 6px;
+  background: #fee2e2;
+  padding: 4px;
+  border-radius: 4px;
+}
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  justify-content: flex-end;
+}
+.modal-buttons button {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.modal-buttons button:first-child {
+  background: #3b82f6;
+  color: white;
+}
+.modal-buttons button:last-child {
+  background: #e5e7eb;
+  color: #1f2937;
+}

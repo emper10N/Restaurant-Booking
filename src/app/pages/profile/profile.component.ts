@@ -13,7 +13,7 @@ const phonePattern = /^\+7\d{10}$/;
   selector: 'app-profile',
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink, Card],
-  templateUrl: './profile.component.html'
+  templateUrl: './profile.component.html',
 })
 export class ProfileComponent {
   private readonly fb = inject(FormBuilder);
@@ -32,7 +32,7 @@ export class ProfileComponent {
     firstName: ['', [Validators.pattern(namePattern)]],
     middleName: ['', [Validators.pattern(namePattern)]],
     phone: ['', [Validators.pattern(phonePattern)]],
-    email: ['', [Validators.email]]
+    email: ['', [Validators.email]],
   });
 
   readonly user = this.auth.user;
@@ -51,7 +51,7 @@ export class ProfileComponent {
           if (d) this.patchFromUser(d);
           this.loading.set(false);
         },
-        error: () => this.loading.set(false)
+        error: () => this.loading.set(false),
       });
       return;
     }
@@ -63,23 +63,24 @@ export class ProfileComponent {
           if (d) this.patchFromUser(d);
           this.loading.set(false);
         },
-        error: () => this.loading.set(false)
+        error: () => this.loading.set(false),
       });
       return;
     }
     if (currentUser.role === 'MANAGER') {
-        this.api.getManagerUsers().subscribe({
+      this.api.getManagerUsers().subscribe({
         next: (res) => {
-          const myData = (res.data ?? []).find((item) => item.id === currentUser.userId);
+          const myData = (res.data ?? []).find(
+            (item) => item.id === currentUser.userId,
+          );
           if (myData) {
             this.patchFromUser(myData);
           }
           this.loading.set(false);
         },
-        error: () => this.loading.set(false)
+        error: () => this.loading.set(false),
       });
     }
-    
   }
 
   private patchFromUser(d: UserListItem): void {
@@ -88,7 +89,7 @@ export class ProfileComponent {
       firstName: d.firstName ?? '',
       middleName: d.middleName ?? '',
       phone: d.phone ?? '',
-      email: d.email ?? ''
+      email: d.email ?? '',
     });
   }
 
@@ -106,7 +107,7 @@ export class ProfileComponent {
         this.message.set(err?.error?.message ?? 'Не удалось сохранить');
         this.messageIsError.set(true);
       },
-      complete: () => this.saving.set(false)
+      complete: () => this.saving.set(false),
     });
   }
 
@@ -124,7 +125,7 @@ export class ProfileComponent {
         this.message.set(err?.error?.message ?? 'Не удалось удалить аккаунт');
         this.messageIsError.set(true);
         this.deleting.set(false);
-      }
+      },
     });
   }
 }

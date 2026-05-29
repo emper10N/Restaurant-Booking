@@ -6,16 +6,16 @@ import { AppApiService } from '../../../core/services/app-api.service';
 import { Booking } from '../../../core/models/models';
 import { AuthService } from '../../../core/services/auth.service';
 
-export interface IStatus{
-  ru: string,
-  eu:string
+export interface IStatus {
+  ru: string;
+  eu: string;
 }
 
 @Component({
   selector: 'app-manager-bookings',
   standalone: true,
   imports: [ReactiveFormsModule, Card],
-  templateUrl: './manager-bookings.component.html'
+  templateUrl: './manager-bookings.component.html',
 })
 export class ManagerBookingsComponent {
   private readonly api = inject(AppApiService);
@@ -23,7 +23,8 @@ export class ManagerBookingsComponent {
   private readonly route = inject(ActivatedRoute);
   readonly auth = inject(AuthService);
 
-  readonly pageTitle = (this.route.snapshot.data['pageTitle'] as string) ?? 'Бронирования';
+  readonly pageTitle =
+    (this.route.snapshot.data['pageTitle'] as string) ?? 'Бронирования';
   readonly bookings = signal<Booking[]>([]);
   readonly loading = signal(false);
   readonly detail = signal<Booking | null>(null);
@@ -31,18 +32,23 @@ export class ManagerBookingsComponent {
   readonly statusUpdating = signal<number | null>(null);
   public visibleStatus: string = '';
 
-  readonly statusOptions: IStatus[] = [{ru:'Ожидает подтверждения', eu: 'PENDING_CONFIRMATION'},
-    {ru:'Подтверждено', eu: 'CONFIRMED'},
-    {ru:'Отменено', eu: 'CANCELLED'},
-    {ru:'Завершено', eu: 'COMPLETED'},
-    {ru:'Не явился', eu: 'NO_SHOW'}
+  readonly statusOptions: IStatus[] = [
+    { ru: 'Ожидает подтверждения', eu: 'PENDING_CONFIRMATION' },
+    { ru: 'Подтверждено', eu: 'CONFIRMED' },
+    { ru: 'Отменено', eu: 'CANCELLED' },
+    { ru: 'Завершено', eu: 'COMPLETED' },
+    { ru: 'Не явился', eu: 'NO_SHOW' },
   ];
 
-  readonly adminQuickActions: Array<{ label: string; status: string; variant: string }> = [
+  readonly adminQuickActions: Array<{
+    label: string;
+    status: string;
+    variant: string;
+  }> = [
     { label: 'Подтвердить', status: 'CONFIRMED', variant: 'confirm' },
     { label: 'Отменить', status: 'CANCELLED', variant: 'danger' },
     { label: 'Завершить', status: 'COMPLETED', variant: 'neutral' },
-    { label: 'Неявка', status: 'NO_SHOW', variant: 'warn' }
+    { label: 'Неявка', status: 'NO_SHOW', variant: 'warn' },
   ];
 
   readonly filtersForm = this.fb.group({
@@ -50,7 +56,7 @@ export class ManagerBookingsComponent {
     dateTo: '',
     status: '',
     userId: '',
-    tableId: ''
+    tableId: '',
   });
 
   constructor() {
@@ -66,19 +72,21 @@ export class ManagerBookingsComponent {
         dateTo: value.dateTo ?? undefined,
         status: value.status ?? undefined,
         userId: value.userId ? Number(value.userId) : undefined,
-        tableId: value.tableId ? Number(value.tableId) : undefined
+        tableId: value.tableId ? Number(value.tableId) : undefined,
       })
       .subscribe({
         next: (res) => {
           const rows = res.data ?? [];
           rows.sort((a, b) => {
-            const da = `${a.bookingDate}T${a.timeStart}`.localeCompare(`${b.bookingDate}T${b.timeStart}`);
+            const da = `${a.bookingDate}T${a.timeStart}`.localeCompare(
+              `${b.bookingDate}T${b.timeStart}`,
+            );
             return da < 0 ? 1 : da > 0 ? -1 : 0;
           });
           this.bookings.set(rows);
           this.loading.set(false);
         },
-        error: () => this.loading.set(false)
+        error: () => this.loading.set(false),
       });
   }
 
@@ -90,7 +98,7 @@ export class ManagerBookingsComponent {
         this.detail.set(res.data);
         this.detailLoading.set(false);
       },
-      error: () => this.detailLoading.set(false)
+      error: () => this.detailLoading.set(false),
     });
   }
 
@@ -111,7 +119,7 @@ export class ManagerBookingsComponent {
           this.closeDetail();
         }
       },
-      error: () => this.statusUpdating.set(null)
+      error: () => this.statusUpdating.set(null),
     });
   }
 
@@ -130,7 +138,7 @@ export class ManagerBookingsComponent {
         this.visibleStatus = 'Завершено';
         return 'status-completed';
       case 'NO_SHOW':
-        this.visibleStatus ='Не явился';
+        this.visibleStatus = 'Не явился';
         return 'status-noshow';
       default:
         return '';

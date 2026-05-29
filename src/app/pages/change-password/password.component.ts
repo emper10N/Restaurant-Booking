@@ -8,7 +8,7 @@ import { AppApiService } from '../../core/services/app-api.service';
   selector: 'app-password',
   standalone: true,
   imports: [ReactiveFormsModule, Card],
-  templateUrl: './password.component.html'
+  templateUrl: './password.component.html',
 })
 export class PasswordComponent {
   private readonly fb = inject(FormBuilder);
@@ -19,7 +19,7 @@ export class PasswordComponent {
   readonly form = this.fb.nonNullable.group({
     currentPassword: ['', Validators.required],
     newPassword: ['', [Validators.required, Validators.minLength(6)]],
-    confirmNewPassword: ['', [Validators.required, Validators.minLength(6)]]
+    confirmNewPassword: ['', [Validators.required, Validators.minLength(6)]],
   });
 
   submit() {
@@ -30,7 +30,8 @@ export class PasswordComponent {
     }
     this.api.updatePassword(value).subscribe({
       next: () => this.router.navigateByUrl('/profile'),
-      error: (err) => this.error.set(err?.error?.message ?? 'Не удалось сменить пароль')
+      error: (err) =>
+        this.error.set(err?.error?.message ?? 'Не удалось сменить пароль'),
     });
   }
 }

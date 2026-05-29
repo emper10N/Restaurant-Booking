@@ -2,7 +2,13 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Card } from 'primeng/card';
 import { AppApiService } from '../../core/services/app-api.service';
-import { PackageItem, SelectItem, ServiceItem, TableItem, ZoneItem } from '../../core/models/models';
+import {
+  PackageItem,
+  SelectItem,
+  ServiceItem,
+  TableItem,
+  ZoneItem,
+} from '../../core/models/models';
 import { TextareaModule } from 'primeng/textarea';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { AutoCompleteModule } from 'primeng/autocomplete';
@@ -10,18 +16,27 @@ import { FormsModule } from '@angular/forms';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DateService } from '../../core/services/date-service';
 import { Subject } from 'rxjs';
-import {PublicFloorPlanComponent} from '../../floor-planner/components/public-floor-plan.component';
+import { PublicFloorPlanComponent } from '../../floor-planner/components/public-floor-plan.component';
 
 interface AutoCompleteCompleteEvent {
-    originalEvent: Event;
-    query: string;
+  originalEvent: Event;
+  query: string;
 }
 
 @Component({
   selector: 'app-booking',
   standalone: true,
-  imports: [PublicFloorPlanComponent, ReactiveFormsModule, Card, TextareaModule, FloatLabelModule, AutoCompleteModule, FormsModule, CheckboxModule],
-  templateUrl: './booking.component.html'
+  imports: [
+    PublicFloorPlanComponent,
+    ReactiveFormsModule,
+    Card,
+    TextareaModule,
+    FloatLabelModule,
+    AutoCompleteModule,
+    FormsModule,
+    CheckboxModule,
+  ],
+  templateUrl: './booking.component.html',
 })
 export class BookingComponent {
   private readonly fb = inject(FormBuilder);
@@ -45,20 +60,20 @@ export class BookingComponent {
   items!: any[];
   value!: any;
   table!: TableItem;
-  date: string = "";
-  time:string = "";
+  date: string = '';
+  time: string = '';
   zone!: ZoneItem;
 
   selectedServices: { [key: number]: boolean } = {};
   serviceCheckState: { [key: number]: boolean } = {};
   readonly pkgPrice = computed(() => {
-  const pkg = this.selectedPackage();
-  return pkg?.totalPrice ?? 0;
+    const pkg = this.selectedPackage();
+    return pkg?.totalPrice ?? 0;
   });
 
   toggleService(serviceId: number, checked: boolean) {
     this.selectedServices[serviceId] = checked;
-    
+
     const current = this.selectedServiceIds();
     if (checked) {
       this.selectedServiceIds.set([...current, serviceId]);
@@ -68,20 +83,19 @@ export class BookingComponent {
   }
 
   isPackageService(id: number): boolean {
-  return this.packageServiceIds().has(id);
-}
-
+    return this.packageServiceIds().has(id);
+  }
 
   isServiceDisabled(id: number): boolean {
     return this.isPackageService(id);
   }
-  
+
   isServiceChecked(id: number): boolean {
     return this.selectedServiceIds().includes(id);
   }
 
   readonly todayStr = (() => {
-    const d = new Date(new Date().getTime()+ 5*60*60*1000);
+    const d = new Date(new Date().getTime() + 5 * 60 * 60 * 1000);
     return d.toISOString().slice(0, 10);
   })();
 
@@ -94,49 +108,54 @@ export class BookingComponent {
   readonly extraServicesTotal = computed(() => {
     const pkgIds = this.packageServiceIds();
     return this.services()
-      .filter((s) => this.selectedServiceIds().includes(s.id) && !pkgIds.has(s.id))
+      .filter(
+        (s) => this.selectedServiceIds().includes(s.id) && !pkgIds.has(s.id),
+      )
       .reduce((acc, s) => acc + s.price, 0 + this.pkgPrice());
   });
 
   readonly form = this.fb.nonNullable.group({
     bookingDate: ['', Validators.required],
     timeStart: ['', Validators.required],
-    guestCount: [2, [Validators.required, Validators.min(1), Validators.max(20)]],
+    guestCount: [
+      2,
+      [Validators.required, Validators.min(1), Validators.max(20)],
+    ],
     reasonId: [0, [Validators.required, Validators.min(1)]],
     packageId: [0],
     zoneName: [''],
     tableId: [0, [Validators.required, Validators.min(1)]],
-    comment: ['', Validators.maxLength(500)]
+    comment: ['', Validators.maxLength(500)],
   });
 
-    onTableSelected(table: TableItem) {
-      this.table = table;
-      this.form.controls.tableId.setValue(this.table.id);
-    } 
+  onTableSelected(table: TableItem) {
+    this.table = table;
+    this.form.controls.tableId.setValue(this.table.id);
+  }
   constructor() {
     this.loadInitialData();
   }
 
   ngOnInit() {
-    this.form.controls.bookingDate.valueChanges.subscribe(date => {
+    this.form.controls.bookingDate.valueChanges.subscribe((date) => {
       if (date) {
         this.updateTimeSlots(date);
-    }
+      }
     });
-    
+
     let initialDate = this.form.controls.bookingDate.value;
     if (initialDate) {
       this.updateTimeSlots(initialDate);
     }
   }
 
-    private updateTimeSlots(date: string) {
+  private updateTimeSlots(date: string) {
     let slots = this.dateService.generateFutureTimeSlots(date);
     this.timeSlots.set(slots);
-    
+
     if (slots.length > 0) {
       let currentTime = this.form.controls.timeStart.value;
-      
+
       if (!currentTime || !slots.includes(currentTime)) {
         this.form.patchValue({ timeStart: slots[0] });
       }
@@ -146,12 +165,12 @@ export class BookingComponent {
       this.infoIsError.set(true);
     }
   }
-  
+
   onDateChange() {
     const date = this.form.controls.bookingDate.value;
     if (date) {
       this.updateTimeSlots(date);
-      
+
       if (date === this.todayStr && !this.dateService.canBookToday()) {
         this.info.set('Бронирование на сегодня недоступно (после 22:00)');
         this.infoIsError.set(true);
@@ -168,7 +187,9 @@ export class BookingComponent {
       this.packages.set([]);
       return;
     }
-    this.api.getPackages({ reasonId, activeOnly: true }).subscribe((res) => this.packages.set(res.data ?? []));
+    this.api
+      .getPackages({ reasonId, activeOnly: true })
+      .subscribe((res) => this.packages.set(res.data ?? []));
   }
 
   onPackageChange() {
@@ -191,29 +212,29 @@ export class BookingComponent {
       error: () => {
         const fallback = this.packages().find((p) => p.id === pid);
         if (fallback) this.applyPackageServices(fallback);
-      }
+      },
     });
   }
 
   private applyPackageServices(pkg: PackageItem) {
-  this.selectedPackage.set(pkg);
-  
-  const packageServiceIds = new Set<number>();
-  
-  for (const s of pkg.services ?? []) {
-    packageServiceIds.add(s.serviceId);
-    this.serviceCheckState[s.serviceId] = true;
+    this.selectedPackage.set(pkg);
+
+    const packageServiceIds = new Set<number>();
+
+    for (const s of pkg.services ?? []) {
+      packageServiceIds.add(s.serviceId);
+      this.serviceCheckState[s.serviceId] = true;
+    }
+
+    this.packageServiceIds.set(packageServiceIds);
+
+    const currentSelected = new Set(this.selectedServiceIds());
+    for (const serviceId of packageServiceIds) {
+      currentSelected.add(serviceId);
+    }
+
+    this.selectedServiceIds.set([...currentSelected]);
   }
-  
-  this.packageServiceIds.set(packageServiceIds);
-  
-  const currentSelected = new Set(this.selectedServiceIds());
-  for (const serviceId of packageServiceIds) {
-    currentSelected.add(serviceId);
-  }
-  
-  this.selectedServiceIds.set([...currentSelected]);
-}
 
   submit() {
     this.info.set(null);
@@ -227,15 +248,17 @@ export class BookingComponent {
       return;
     }
     const data = this.form.getRawValue();
-      
+
     if (!this.table) {
-      console.log(!this.table)
+      console.log(!this.table);
       this.info.set('Выберите стол из списка доступных');
       this.infoIsError.set(true);
       return;
     }
     if (data.guestCount > this.table.capacity) {
-      this.info.set(`Число гостей превышает вместимость стола (${this.table.capacity})`);
+      this.info.set(
+        `Число гостей превышает вместимость стола (${this.table.capacity})`,
+      );
       this.infoIsError.set(true);
       return;
     }
@@ -247,7 +270,7 @@ export class BookingComponent {
       timeStart: data.timeStart,
       comment: data.comment?.trim() ?? '',
       serviceIds: this.selectedServiceIds(),
-      packageId: data.packageId || null
+      packageId: data.packageId || null,
     };
     this.submitting.set(true);
     this.api.createBooking(payload).subscribe({
@@ -261,7 +284,7 @@ export class BookingComponent {
         this.submitting.set(false);
         this.info.set(err?.error?.message ?? 'Ошибка создания бронирования');
         this.infoIsError.set(true);
-      }
+      },
     });
   }
 
@@ -277,19 +300,22 @@ export class BookingComponent {
         this.reasons.set(res.data ?? []);
         done();
       },
-      error: () => done()
+      error: () => done(),
     });
     this.api.getServices().subscribe({
       next: (res) => {
         this.services.set(res.data ?? []);
         done();
       },
-      error: () => done()
+      error: () => done(),
     });
-    this.form.patchValue({ bookingDate: this.todayStr, timeStart: this.dateService.generateFutureTimeSlots(this.todayStr)[0] });
+    this.form.patchValue({
+      bookingDate: this.todayStr,
+      timeStart: this.dateService.generateFutureTimeSlots(this.todayStr)[0],
+    });
   }
 
-  onZoneSelected(zone: ZoneItem){
+  onZoneSelected(zone: ZoneItem) {
     this.zone = zone;
     this.form.controls.zoneName.setValue(this.zone.name);
   }

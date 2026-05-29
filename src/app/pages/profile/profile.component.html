@@ -5,28 +5,53 @@
     @if (user(); as u) {
       <div class="readonly-row">
         <span class="muted">Логин</span>
-        <strong>{{ u.login || '—' }}</strong>
+        <strong>{{ u.login || "—" }}</strong>
       </div>
     }
     @if (message()) {
-      <p [class]="messageIsError() ? 'banner error' : 'banner ok'">{{ message() }}</p>
+      <p [class]="messageIsError() ? 'banner error' : 'banner ok'">
+        {{ message() }}
+      </p>
     }
     <form [formGroup]="form" (ngSubmit)="submit()">
       <div class="grid">
-        <label class="col-12 md:col-4">Фамилия <input class="w-full" formControlName="lastName" /></label>
-        <label class="col-12 md:col-4">Имя <input class="w-full" formControlName="firstName" /></label>
-        <label class="col-12 md:col-4">Отчество <input class="w-full" formControlName="middleName" /></label>
-        <label class="col-12 md:col-6">Телефон <input class="w-full" formControlName="phone" placeholder="+79991234567" /></label>
-        <label class="col-12 md:col-6">Email <input class="w-full" type="email" formControlName="email" /></label>
+        <label class="col-12 md:col-4"
+          >Фамилия <input class="w-full" formControlName="lastName"
+        /></label>
+        <label class="col-12 md:col-4"
+          >Имя <input class="w-full" formControlName="firstName"
+        /></label>
+        <label class="col-12 md:col-4"
+          >Отчество <input class="w-full" formControlName="middleName"
+        /></label>
+        <label class="col-12 md:col-6"
+          >Телефон
+          <input
+            class="w-full"
+            formControlName="phone"
+            placeholder="+79991234567"
+        /></label>
+        <label class="col-12 md:col-6"
+          >Email <input class="w-full" type="email" formControlName="email"
+        /></label>
       </div>
       <div class="actions-row">
-        <button type="submit" [disabled]="saving()">{{ saving() ? 'Сохранение…' : 'Сохранить изменения' }}</button>
-        <a class="btn-secondary link-button" routerLink="/profile/password">Сменить пароль</a>
+        <button type="submit" [disabled]="saving()">
+          {{ saving() ? "Сохранение…" : "Сохранить изменения" }}
+        </button>
+        <a class="btn-secondary link-button" routerLink="/profile/password"
+          >Сменить пароль</a
+        >
       </div>
     </form>
     <div class="danger-zone">
-      <button type="button" class="btn-danger w-full sm:w-auto" [disabled]="deleting()" (click)="deleteAccount()">
-        {{ deleting() ? 'Удаление…' : 'Удалить аккаунт' }}
+      <button
+        type="button"
+        class="btn-danger w-full sm:w-auto"
+        [disabled]="deleting()"
+        (click)="deleteAccount()"
+      >
+        {{ deleting() ? "Удаление…" : "Удалить аккаунт" }}
       </button>
     </div>
   }

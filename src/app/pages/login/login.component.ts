@@ -10,8 +10,15 @@ import { PasswordModule } from 'primeng/password';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, Card, FloatLabelModule, InputTextModule, PasswordModule],
-  templateUrl: './login.component.html'
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    Card,
+    FloatLabelModule,
+    InputTextModule,
+    PasswordModule,
+  ],
+  templateUrl: './login.component.html',
 })
 export class LoginComponent {
   private readonly fb = inject(FormBuilder);
@@ -28,14 +35,16 @@ export class LoginComponent {
 
   readonly form = this.fb.nonNullable.group({
     login: ['', Validators.required],
-    password: ['', Validators.required]
+    password: ['', Validators.required],
   });
 
   submit() {
     if (this.form.invalid || this.loading()) return;
     const now = Date.now();
     if (now < this.lockUntil) {
-      this.error.set(`Повторите попытку через ${Math.ceil((this.lockUntil - now) / 1000)} с`);
+      this.error.set(
+        `Повторите попытку через ${Math.ceil((this.lockUntil - now) / 1000)} с`,
+      );
       return;
     }
     this.loading.set(true);
@@ -52,13 +61,15 @@ export class LoginComponent {
         if (this.failedAttempts >= 3) {
           this.lockUntil = Date.now() + 60_000;
           this.failedAttempts = 0;
-          this.error.set('Слишком много неудачных попыток. Вход заблокирован на 1 минуту.');
+          this.error.set(
+            'Слишком много неудачных попыток. Вход заблокирован на 1 минуту.',
+          );
           this.startLockCountdown();
         } else {
           this.error.set(err?.error?.message ?? 'Ошибка входа');
         }
       },
-      complete: () => this.loading.set(false)
+      complete: () => this.loading.set(false),
     });
   }
 

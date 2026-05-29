@@ -9,27 +9,27 @@ import { PlannerFabricComponent } from '../../../floor-planner/components/planne
   selector: 'app-admin-tables',
   standalone: true,
   imports: [ReactiveFormsModule, Card, PlannerFabricComponent],
-  templateUrl: './admin-tables.component.html'
+  templateUrl: './admin-tables.component.html',
 })
 export class AdminTablesComponent {
   private readonly api = inject(AppApiService);
   private readonly fb = inject(FormBuilder);
   readonly zones = signal<ZoneItem[]>([]);
   readonly tables = signal<TableItem[]>([]);
-  
+
   readonly info = signal<string | null>(null);
   readonly infoIsError = signal(false);
 
   readonly zoneForm = this.fb.nonNullable.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
-    description: ['']
+    description: [''],
   });
 
   readonly tableForm = this.fb.nonNullable.group({
     zoneId: [0, Validators.required],
     number: ['', Validators.required],
     capacity: [2, [Validators.required, Validators.min(1), Validators.max(20)]],
-    locationDescription: ['']
+    locationDescription: [''],
   });
 
   constructor() {
@@ -50,34 +50,42 @@ export class AdminTablesComponent {
   }
 
   toggleZone(zone: ZoneItem) {
-    this.api.toggleZoneActive(zone.id, !zone.active).subscribe(() => this.reload());
+    this.api
+      .toggleZoneActive(zone.id, !zone.active)
+      .subscribe(() => this.reload());
   }
 
   removeZone(id: number) {
     // Проверяем, есть ли столы в этой зоне
-    const tablesInZone = this.tables().filter(table => table.zoneId === id);
-    
+    const tablesInZone = this.tables().filter((table) => table.zoneId === id);
+
     if (tablesInZone.length > 0) {
       // Показываем список столов в зоне
-      const tableNumbers = tablesInZone.map(t => `№${t.number}`).join(', ');
-      this.info.set(`Невозможно удалить зону. В ней находятся столы: ${tableNumbers}`);
+      const tableNumbers = tablesInZone.map((t) => `№${t.number}`).join(', ');
+      this.info.set(
+        `Невозможно удалить зону. В ней находятся столы: ${tableNumbers}`,
+      );
       this.infoIsError.set(true);
-      
+
       // Спрашиваем, хочет ли пользователь удалить все столы
-      if (confirm(`В зоне есть столы: ${tableNumbers}. Удалить их все и затем удалить зону?`)) {
+      if (
+        confirm(
+          `В зоне есть столы: ${tableNumbers}. Удалить их все и затем удалить зону?`,
+        )
+      ) {
         this.deleteTablesAndZone(id, tablesInZone);
       }
       return;
     }
-    
+
     // Если столов нет, просто удаляем зону
     this.deleteZoneWithConfirmation(id);
   }
 
   private deleteZoneWithConfirmation(id: number) {
-    const zone = this.zones().find(z => z.id === id);
+    const zone = this.zones().find((z) => z.id === id);
     const zoneName = zone?.name || `#${id}`;
-    
+
     if (confirm(`Удалить зону "${zoneName}"?`)) {
       this.api.deleteZone(id).subscribe({
         next: () => {
@@ -88,16 +96,16 @@ export class AdminTablesComponent {
         error: (err) => {
           this.info.set(err?.error?.error?.message || 'Ошибка удаления зоны');
           this.infoIsError.set(true);
-        }
+        },
       });
     }
   }
 
   private deleteTablesAndZone(zoneId: number, tables: TableItem[]) {
     let deletedCount = 0;
-    
+
     // Удаляем все столы по очереди
-    tables.forEach(table => {
+    tables.forEach((table) => {
       this.api.deleteTable(table.id).subscribe({
         next: () => {
           deletedCount++;
@@ -110,16 +118,20 @@ export class AdminTablesComponent {
                 this.reload();
               },
               error: (err) => {
-                this.info.set(err?.error?.error?.message || 'Ошибка удаления зоны');
+                this.info.set(
+                  err?.error?.error?.message || 'Ошибка удаления зоны',
+                );
                 this.infoIsError.set(true);
-              }
+              },
             });
           }
         },
         error: (err) => {
-          this.info.set(`Ошибка удаления стола №${table.number}: ${err?.error?.error?.message}`);
+          this.info.set(
+            `Ошибка удаления стола №${table.number}: ${err?.error?.error?.message}`,
+          );
           this.infoIsError.set(true);
-        }
+        },
       });
     });
   }
@@ -130,62 +142,73 @@ export class AdminTablesComponent {
     this.api
       .createTable({ ...value, zoneId: Number(value.zoneId) })
       .subscribe(() => {
-        this.tableForm.reset({ zoneId: 0, number: '', capacity: 2, locationDescription: '' });
+        this.tableForm.reset({
+          zoneId: 0,
+          number: '',
+          capacity: 2,
+          locationDescription: '',
+        });
         this.reload();
       });
   }
 
   toggleTable(table: TableItem) {
-    this.api.toggleTableActive(table.id, !table.active).subscribe(() => this.reload());
+    this.api
+      .toggleTableActive(table.id, !table.active)
+      .subscribe(() => this.reload());
   }
 
   removeTable(id: number) {
     // Находим стол по ID для отображения информации
-    const table = this.tables().find(t => t.id === id);
+    const table = this.tables().find((t) => t.id === id);
     const tableInfo = table ? `№${table.number}` : `#${id}`;
-    
+
     if (!confirm(`Удалить стол ${tableInfo}?`)) {
-        return;
+      return;
     }
-    
+
     console.log('Попытка удаления стола:', { id, table });
-    
+
     this.api.deleteTable(id).subscribe({
-        next: (response) => {
-            console.log('Стол успешно удален:', response);
-            this.info.set(`Стол ${tableInfo} удален`);
-            this.infoIsError.set(false);
-            this.reload();
-        },
-        error: (err) => {
-            console.error('Ошибка удаления стола:', err);
-            
-            // Детальная информация об ошибке
-            let errorMessage = 'Ошибка удаления стола';
-            
-            if (err.status === 400) {
-                errorMessage = err?.error?.error?.message || 'Некорректный запрос на удаление';
-            } else if (err.status === 404) {
-                errorMessage = 'Стол не найден (возможно, уже удален)';
-                // Обновляем список после 404
-                setTimeout(() => this.reload(), 1000);
-            } else if (err.status === 409 || err?.error?.error?.code === 'TABLE_HAS_BOOKINGS') {
-                errorMessage = 'Невозможно удалить стол: есть активные бронирования';
-            } else if (err.status === 500) {
-                errorMessage = 'Внутренняя ошибка сервера';
-            }
-            
-            this.info.set(errorMessage);
-            this.infoIsError.set(true);
-            
-            // Показываем сырой ответ сервера в консоль
-            console.log('Полный ответ ошибки:', {
-                status: err.status,
-                statusText: err.statusText,
-                error: err.error,
-                url: err.url
-            });
+      next: (response) => {
+        console.log('Стол успешно удален:', response);
+        this.info.set(`Стол ${tableInfo} удален`);
+        this.infoIsError.set(false);
+        this.reload();
+      },
+      error: (err) => {
+        console.error('Ошибка удаления стола:', err);
+
+        // Детальная информация об ошибке
+        let errorMessage = 'Ошибка удаления стола';
+
+        if (err.status === 400) {
+          errorMessage =
+            err?.error?.error?.message || 'Некорректный запрос на удаление';
+        } else if (err.status === 404) {
+          errorMessage = 'Стол не найден (возможно, уже удален)';
+          // Обновляем список после 404
+          setTimeout(() => this.reload(), 1000);
+        } else if (
+          err.status === 409 ||
+          err?.error?.error?.code === 'TABLE_HAS_BOOKINGS'
+        ) {
+          errorMessage = 'Невозможно удалить стол: есть активные бронирования';
+        } else if (err.status === 500) {
+          errorMessage = 'Внутренняя ошибка сервера';
         }
+
+        this.info.set(errorMessage);
+        this.infoIsError.set(true);
+
+        // Показываем сырой ответ сервера в консоль
+        console.log('Полный ответ ошибки:', {
+          status: err.status,
+          statusText: err.statusText,
+          error: err.error,
+          url: err.url,
+        });
+      },
     });
-}
+  }
 }

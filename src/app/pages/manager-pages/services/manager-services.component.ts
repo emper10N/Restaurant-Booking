@@ -7,7 +7,7 @@ import { PackageItem, ServiceItem } from '../../../core/models/models';
   selector: 'app-manager-services',
   standalone: true,
   imports: [Card],
-  templateUrl: './manager-services.component.html'
+  templateUrl: './manager-services.component.html',
 })
 export class ManagerServicesComponent {
   private readonly api = inject(AppApiService);
@@ -15,7 +15,11 @@ export class ManagerServicesComponent {
   readonly packages = signal<PackageItem[]>([]);
 
   constructor() {
-    this.api.getServices(false).subscribe((res) => this.services.set(res.data ?? []));
-    this.api.getPackages().subscribe((res) => this.packages.set(res.data ?? []));
+    this.api
+      .getServices(false)
+      .subscribe((res) => this.services.set(res.data ?? []));
+    this.api
+      .getPackages()
+      .subscribe((res) => this.packages.set(res.data ?? []));
   }
 }

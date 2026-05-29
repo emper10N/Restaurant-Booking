@@ -14,8 +14,15 @@ const phonePattern = /^\+7\d{10}$/;
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, Card, FloatLabelModule, InputTextModule, PasswordModule],
-  templateUrl: './register.component.html'
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    Card,
+    FloatLabelModule,
+    InputTextModule,
+    PasswordModule,
+  ],
+  templateUrl: './register.component.html',
 })
 export class RegisterComponent {
   private readonly fb = inject(FormBuilder);
@@ -32,7 +39,7 @@ export class RegisterComponent {
     firstName: ['', [Validators.required, Validators.pattern(namePattern)]],
     middleName: ['', [Validators.pattern(namePattern)]],
     phone: ['', [Validators.pattern(phonePattern)]],
-    email: ['', [Validators.required, Validators.email]]
+    email: ['', [Validators.required, Validators.email]],
   });
 
   submit() {
@@ -48,8 +55,9 @@ export class RegisterComponent {
       next: () => {
         this.router.navigateByUrl('/login');
       },
-      error: (err) => this.message.set(err?.error?.message ?? 'Ошибка регистрации'),
-      complete: () => this.loading.set(false)
+      error: (err) =>
+        this.message.set(err?.error?.message ?? 'Ошибка регистрации'),
+      complete: () => this.loading.set(false),
     });
   }
 }

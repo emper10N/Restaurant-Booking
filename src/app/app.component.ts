@@ -13,7 +13,7 @@ import { MenubarModule } from 'primeng/menubar';
   selector: 'app-root',
   imports: [RouterOutlet, RouterLink, Drawer, Button, MenubarModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
 })
 export class AppComponent {
   readonly auth = inject(AuthService);
@@ -24,7 +24,7 @@ export class AppComponent {
   /** Показывать выезжающее меню вместо горизонтальной навигации */
   readonly isMobile = toSignal(
     this.breakpoint.observe('(max-width: 991px)').pipe(map((r) => r.matches)),
-    { initialValue: false }
+    { initialValue: false },
   );
 
   drawerOpen = false;

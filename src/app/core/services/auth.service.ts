@@ -16,13 +16,15 @@ export class AuthService {
   constructor(private readonly http: HttpClient) {}
 
   login(payload: { login: string; password: string }) {
-    return this.http.post<ApiResponse<AuthPayload>>(`${API_BASE}/api/auth/login`, payload).pipe(
-      tap((response) => {
-        if (response.data) {
-          this.persistSession(response.data);
-        }
-      })
-    );
+    return this.http
+      .post<ApiResponse<AuthPayload>>(`${API_BASE}/api/auth/login`, payload)
+      .pipe(
+        tap((response) => {
+          if (response.data) {
+            this.persistSession(response.data);
+          }
+        }),
+      );
   }
 
   register(payload: {
@@ -35,7 +37,10 @@ export class AuthService {
     phone?: string;
     email: string;
   }) {
-    return this.http.post<ApiResponse<AuthPayload>>(`${API_BASE}/api/auth/register`, payload);
+    return this.http.post<ApiResponse<AuthPayload>>(
+      `${API_BASE}/api/auth/register`,
+      payload,
+    );
   }
 
   logout() {
@@ -56,7 +61,7 @@ export class AuthService {
       userId: data.userId,
       role: data.role,
       fullName: data.fullName,
-      login: this.extractLoginFromJwt(data.token)
+      login: this.extractLoginFromJwt(data.token),
     };
     localStorage.setItem(TOKEN_KEY, data.token);
     localStorage.setItem(USER_KEY, JSON.stringify(user));
@@ -85,7 +90,9 @@ export class AuthService {
   private extractLoginFromJwt(token: string): string {
     try {
       const base64Payload = token.split('.')[1];
-      const decodedPayload = JSON.parse(atob(base64Payload.replace(/-/g, '+').replace(/_/g, '/')));
+      const decodedPayload = JSON.parse(
+        atob(base64Payload.replace(/-/g, '+').replace(/_/g, '/')),
+      );
       return decodedPayload.sub ?? '';
     } catch {
       return '';

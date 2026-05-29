@@ -1,5 +1,5 @@
-@import 'primeflex/primeflex.css';
-@import 'primeicons/primeicons.css';
+@import "primeflex/primeflex.css";
+@import "primeicons/primeicons.css";
 
 * {
   box-sizing: border-box;
@@ -114,7 +114,7 @@ td {
 }
 
 .status-badge,
-span[class^='status-'] {
+span[class^="status-"] {
   display: inline-block;
   padding: 0.2rem 0.5rem;
   border-radius: 6px;

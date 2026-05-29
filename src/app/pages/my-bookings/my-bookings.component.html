@@ -7,7 +7,9 @@
       <article class="booking-card">
         <header class="booking-card__head">
           <h3>#{{ bookings().length - index }}</h3>
-          <span class="status-badge" [class]="statusClass(item.status)">{{ stat }}</span>
+          <span class="status-badge" [class]="statusClass(item.status)">{{
+            stat
+          }}</span>
         </header>
         <p class="muted">
           {{ item.bookingDate }} · {{ item.timeStart!.slice(0, 5) }}
@@ -22,16 +24,29 @@
         @if (item.services?.length) {
           <ul class="services-mini">
             @for (s of item.services; track s.serviceId) {
-              <li>{{ s.serviceName }} × {{ s.quantity ?? 1 }} — {{ s.totalPrice }} ₽</li>
+              <li>
+                {{ s.serviceName }} × {{ s.quantity ?? 1 }} —
+                {{ s.totalPrice }} ₽
+              </li>
             }
           </ul>
         }
-        <p><strong>Итого услуг:</strong> {{ item.totalServicesPrice ?? 0 }} ₽</p>
+        <p>
+          <strong>Итого услуг:</strong> {{ item.totalServicesPrice ?? 0 }} ₽
+        </p>
         @if (item.comment) {
-          <p class="comment"><strong>Комментарий:</strong> {{ item.comment }}</p>
+          <p class="comment">
+            <strong>Комментарий:</strong> {{ item.comment }}
+          </p>
         }
         @if (canCancel(item.status)) {
-          <button type="button" class="btn-danger-outline w-full sm:w-auto" (click)="cancel(item.id)">Отменить</button>
+          <button
+            type="button"
+            class="btn-danger-outline w-full sm:w-auto"
+            (click)="cancel(item.id)"
+          >
+            Отменить
+          </button>
         }
       </article>
     } @empty {

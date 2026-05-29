@@ -1,23 +1,52 @@
 <p-card header="Услуги (ADMIN)" styleClass="page-card">
   <form [formGroup]="form" (ngSubmit)="create()">
     <div class="grid">
-      <label class="col-12 md:col-4">Название <input class="w-full" formControlName="name" /></label>
-      <label class="col-12 md:col-4">Описание <input class="w-full" formControlName="description" /></label>
-      <label class="col-12 md:col-4">Цена <input class="w-full" type="number" formControlName="price" /></label>
+      <label class="col-12 md:col-4"
+        >Название <input class="w-full" formControlName="name"
+      /></label>
+      <label class="col-12 md:col-4"
+        >Описание <input class="w-full" formControlName="description"
+      /></label>
+      <label class="col-12 md:col-4"
+        >Цена <input class="w-full" type="number" formControlName="price"
+      /></label>
     </div>
     <button type="submit" class="w-full md:w-auto">Создать услугу</button>
   </form>
   <div class="table-scroll">
     <table>
-      <thead><tr><th>ID</th><th>Название</th><th>Цена</th><th>Статус</th><th>Действия</th></tr></thead>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Название</th>
+          <th>Цена</th>
+          <th>Статус</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
       <tbody>
         @for (item of services(); track item.id) {
           <tr>
-            <td>{{ item.id }}</td><td>{{ item.name }}</td><td>{{ item.price }} ₽</td><td>{{ item.available ? 'Активна' : 'Неактивна' }}</td>
+            <td>{{ item.id }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.price }} ₽</td>
+            <td>{{ item.available ? "Активна" : "Неактивна" }}</td>
             <td>
               <div class="flex flex-column sm:flex-row flex-wrap gap-2">
-                <button type="button" class="w-full sm:w-auto" (click)="toggle(item)">{{ item.available ? 'Деактивировать' : 'Активировать' }}</button>
-                <button type="button" class="w-full sm:w-auto" (click)="remove(item.id)">Удалить</button>
+                <button
+                  type="button"
+                  class="w-full sm:w-auto"
+                  (click)="toggle(item)"
+                >
+                  {{ item.available ? "Деактивировать" : "Активировать" }}
+                </button>
+                <button
+                  type="button"
+                  class="w-full sm:w-auto"
+                  (click)="remove(item.id)"
+                >
+                  Удалить
+                </button>
               </div>
             </td>
           </tr>

@@ -1,8 +1,12 @@
 <p-card [header]="pageTitle" styleClass="page-card">
   <form [formGroup]="filtersForm" (ngSubmit)="search()">
     <div class="grid">
-      <label class="col-12 sm:col-6 md:col-4">Дата с <input class="w-full" type="date" formControlName="dateFrom" /></label>
-      <label class="col-12 sm:col-6 md:col-4">Дата по <input class="w-full" type="date" formControlName="dateTo" /></label>
+      <label class="col-12 sm:col-6 md:col-4"
+        >Дата с <input class="w-full" type="date" formControlName="dateFrom"
+      /></label>
+      <label class="col-12 sm:col-6 md:col-4"
+        >Дата по <input class="w-full" type="date" formControlName="dateTo"
+      /></label>
       <label class="col-12 sm:col-6 md:col-4">
         Статус
         <select class="w-full" formControlName="status">
@@ -14,7 +18,9 @@
       </label>
     </div>
     <div class="col-15 sm:col- md:col-2 flex align-items-end">
-        <button type="submit" class="w-full" [disabled]="loading()">{{ loading() ? '...' : 'Применить фильтры' }}</button>
+      <button type="submit" class="w-full" [disabled]="loading()">
+        {{ loading() ? "..." : "Применить фильтры" }}
+      </button>
     </div>
   </form>
 
@@ -46,7 +52,9 @@
             <td>№{{ item.table!.number }} ({{ item.table!.zoneName }})</td>
             <td>{{ item.guestCount }}</td>
             <td>
-              <span class="status-badge" [class]="statusClass(item.status)">{{ visibleStatus }}</span>
+              <span class="status-badge" [class]="statusClass(item.status)">{{
+                visibleStatus
+              }}</span>
             </td>
             <td>{{ item.totalServicesPrice ?? 0 }} ₽</td>
           </tr>
@@ -67,7 +75,14 @@
     <div class="modal card" (click)="$event.stopPropagation()">
       <div class="modal-head">
         <h2>Бронирование #{{ detail()?.id }}</h2>
-        <button type="button" class="btn-icon" (click)="closeDetail()" aria-label="Закрыть">×</button>
+        <button
+          type="button"
+          class="btn-icon"
+          (click)="closeDetail()"
+          aria-label="Закрыть"
+        >
+          ×
+        </button>
       </div>
       @if (detailLoading()) {
         <p>Загрузка…</p>
@@ -87,16 +102,21 @@
           <dd>{{ d.reason?.displayName }}</dd>
           <dt>Статус</dt>
           <dd>
-            <span class="status-badge" [class]="statusClass(d.status)">{{ this.visibleStatus }}</span>
+            <span class="status-badge" [class]="statusClass(d.status)">{{
+              this.visibleStatus
+            }}</span>
           </dd>
           <dt>Комментарий</dt>
-          <dd>{{ d.comment || '—' }}</dd>
+          <dd>{{ d.comment || "—" }}</dd>
           <dt>Услуги</dt>
           <dd>
             @if (d.services?.length) {
               <ul class="services-list">
                 @for (s of d.services; track s.serviceId) {
-                  <li>{{ s.serviceName }} × {{ s.quantity ?? 1 }} — {{ s.totalPrice }} ₽</li>
+                  <li>
+                    {{ s.serviceName }} × {{ s.quantity ?? 1 }} —
+                    {{ s.totalPrice }} ₽
+                  </li>
                 }
               </ul>
             } @else {
@@ -107,7 +127,7 @@
           <dd>{{ d.totalServicesPrice ?? 0 }} ₽</dd>
         </dl>
 
-        @if (auth.hasRole(['ADMIN'])) {
+        @if (auth.hasRole(["ADMIN"])) {
           <div class="admin-actions">
             <p class="muted small">Смена статуса (только ADMIN):</p>
             <div class="action-row">

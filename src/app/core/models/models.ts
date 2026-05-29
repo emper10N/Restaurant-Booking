@@ -40,7 +40,12 @@ export interface PackageItem {
   description?: string;
   totalPrice?: number;
   active?: boolean;
-  services?: Array<{ serviceId: number; serviceName: string; quantity: number; price: number }>;
+  services?: Array<{
+    serviceId: number;
+    serviceName: string;
+    quantity: number;
+    price: number;
+  }>;
   reasons?: Array<{ id: number; code: string; displayName: string }>;
 }
 
@@ -89,7 +94,13 @@ export interface Booking {
   comment?: string;
   table: { id: number; number: string; zoneName: string };
   reason?: { id: number; displayName: string };
-  services?: Array<{ serviceId: number; serviceName: string; quantity?: number; price: number; totalPrice: number }>;
+  services?: Array<{
+    serviceId: number;
+    serviceName: string;
+    quantity?: number;
+    price: number;
+    totalPrice: number;
+  }>;
   totalServicesPrice?: number;
 }
 

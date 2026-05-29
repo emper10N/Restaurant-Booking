@@ -9,47 +9,59 @@
     <div class="grid">
       <label class="col-12 md:col-3">
         Дата
-        <input type="date" formControlName="bookingDate" [min]="todayStr" [max]="maxDateStr" />
+        <input
+          type="date"
+          formControlName="bookingDate"
+          [min]="todayStr"
+          [max]="maxDateStr"
+        />
       </label>
       <label class="col-12 md:col-2">
         Время
         <select formControlName="timeStart">
           @if (timeSlots().length === 0) {
-      <option value="">Нет доступного времени</option>
-    }
-    @for (slot of timeSlots(); track slot) {
-      <option [value]="slot">{{ slot }}</option>
-    }
+            <option value="">Нет доступного времени</option>
+          }
+          @for (slot of timeSlots(); track slot) {
+            <option [value]="slot">{{ slot }}</option>
+          }
         </select>
       </label>
       <label class="col-12 md:col-1">
         Гости
         <input type="number" formControlName="guestCount" min="1" max="20" />
       </label>
-    
+
       <label class="col-12 md:col-3">
         Повод визита
         <select formControlName="reasonId" (change)="onReasonChange()">
           <option [value]="0">Выберите повод</option>
           @for (reason of reasons(); track reason.id) {
-            <option [value]="reason.id">{{ reason.name || $any(reason).displayName }}</option>
+            <option [value]="reason.id">
+              {{ reason.name || $any(reason).displayName }}
+            </option>
           }
         </select>
       </label>
     </div>
 
-  <div class="grid">
-    <div class="col-12 md:col-8" style="height: 750px;">
-        <app-public-floor-plan [selectedDateStr]="date" [selectedTimeStr]="time" (selectedTable)="onTableSelected($event)" (zone)="onZoneSelected($event)"></app-public-floor-plan>
-    </div>
+    <div class="grid">
+      <div class="col-12 md:col-8" style="height: 750px">
+        <app-public-floor-plan
+          [selectedDateStr]="date"
+          [selectedTimeStr]="time"
+          (selectedTable)="onTableSelected($event)"
+          (zone)="onZoneSelected($event)"
+        ></app-public-floor-plan>
+      </div>
       <label class="col-12 md:col-4">
         @if (table; as t) {
-        <div class="table-hint">
-          <p><strong>Вместимость:</strong> {{ t.capacity }} гостей</p>
-          @if (t.locationDescription) {
-            <p><strong>Расположение:</strong> {{ t.locationDescription }}</p>
-          }
-        </div>
+          <div class="table-hint">
+            <p><strong>Вместимость:</strong> {{ t.capacity }} гостей</p>
+            @if (t.locationDescription) {
+              <p><strong>Расположение:</strong> {{ t.locationDescription }}</p>
+            }
+          </div>
         }
         Пакет услуг (необязательно)
         <select formControlName="packageId" (change)="onPackageChange()">
@@ -63,52 +75,64 @@
             </option>
           }
         </select>
-          <legend>Рекомендуем к этому столику и поводу</legend>
-          @if (selectedPackage(); as pkg) {
-            <p class="muted small mb-3">
-              В пакет "{{ pkg.name }}" включены услуги: {{ pkg.services?.length ?? 0 }} шт.
-            </p>
-          }
+        <legend>Рекомендуем к этому столику и поводу</legend>
+        @if (selectedPackage(); as pkg) {
+          <p class="muted small mb-3">
+            В пакет "{{ pkg.name }}" включены услуги:
+            {{ pkg.services?.length ?? 0 }} шт.
+          </p>
+        }
 
-    @for (service of services(); track service.id) {
-      <div class="col-12 md:col-12">
-        <div class="flex align-items-center gap-2" [class.package-service]="isPackageService(service.id)">
-          <p-checkbox 
-            [inputId]="'service_' + service.id"
-            [value]="service.id"
-            [ngModelOptions]="{standalone: true}"
-            [(ngModel)]="serviceCheckState[service.id]"
-            [disabled]="isServiceDisabled(service.id)"
-            (onChange)="toggleService(service.id, $event.checked)"
-            [binary]="true">
-          </p-checkbox>
-          <label [for]="'service_' + service.id">
-            {{ service.name }} ({{ service.price}} ₽)
-            @if (isPackageService(service.id)) {
-              <span class="package-badge"></span>
-            }
-          </label>
+        @for (service of services(); track service.id) {
+          <div class="col-12 md:col-12">
+            <div
+              class="flex align-items-center gap-2"
+              [class.package-service]="isPackageService(service.id)"
+            >
+              <p-checkbox
+                [inputId]="'service_' + service.id"
+                [value]="service.id"
+                [ngModelOptions]="{ standalone: true }"
+                [(ngModel)]="serviceCheckState[service.id]"
+                [disabled]="isServiceDisabled(service.id)"
+                (onChange)="toggleService(service.id, $event.checked)"
+                [binary]="true"
+              >
+              </p-checkbox>
+              <label [for]="'service_' + service.id">
+                {{ service.name }} ({{ service.price }} ₽)
+                @if (isPackageService(service.id)) {
+                  <span class="package-badge"></span>
+                }
+              </label>
+            </div>
+          </div>
+        }
+
+        <div class="price-summary">
+          <p>
+            <strong>Стоимость дополнительных услуг:</strong>
+            {{ extraServicesTotal() }}₽
+          </p>
         </div>
-      </div>
-    }
-
-    <div class="price-summary">
-      <p>
-        <strong>Стоимость дополнительных услуг:</strong>
-        {{extraServicesTotal()}}₽
-      </p>
-    </div>
       </label>
-
-  
-  
-  </div>
+    </div>
     <p-floatlabel>
-      <textarea id="over_label" [autoResize]="true" pTextarea formControlName="comment" class="col-12 md:col-12"></textarea>
+      <textarea
+        id="over_label"
+        [autoResize]="true"
+        pTextarea
+        formControlName="comment"
+        class="col-12 md:col-12"
+      ></textarea>
       <label for="over_label">Комментарий</label>
     </p-floatlabel>
-    <button type="submit" class="w-full md:w-auto" [disabled]="submitting() || initialLoading()">
-      {{ submitting() ? 'Отправка…' : 'Забронировать' }}
+    <button
+      type="submit"
+      class="w-full md:w-auto"
+      [disabled]="submitting() || initialLoading()"
+    >
+      {{ submitting() ? "Отправка…" : "Забронировать" }}
     </button>
   </form>
 </p-card>

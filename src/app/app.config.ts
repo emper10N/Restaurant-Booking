@@ -14,7 +14,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     providePrimeNG({
       theme: { preset: Aura },
-      ripple: true
-    })
-  ]
+      ripple: true,
+    }),
+  ],
 };

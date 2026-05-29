@@ -1,4 +1,15 @@
-import { Component, AfterViewInit, ViewChild, ElementRef, input, Input, Signal, inject, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  AfterViewInit,
+  ViewChild,
+  ElementRef,
+  input,
+  Input,
+  Signal,
+  inject,
+  Output,
+  EventEmitter,
+} from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableItem, ZoneItem } from '../../core/models/models';
@@ -12,12 +23,12 @@ import * as fabric from 'fabric';
   imports: [CommonModule, FormsModule],
   providers: [DatePipe],
   templateUrl: './public-floor-plan.component.html',
-  styleUrl: './public-floor-plan.scss'
+  styleUrl: './public-floor-plan.scss',
 })
 export class PublicFloorPlanComponent implements AfterViewInit {
   @ViewChild('canvasEl') canvasRef!: ElementRef<HTMLCanvasElement>;
   private canvas!: fabric.Canvas;
-  zones: ZoneItem[] | null= [];
+  zones: ZoneItem[] | null = [];
   @Output()
   zone = new EventEmitter<ZoneItem>();
   tables: TableItem[] | null = [];
@@ -32,7 +43,7 @@ export class PublicFloorPlanComponent implements AfterViewInit {
 
   constructor() {}
 
-  ngOnInit(){
+  ngOnInit() {
     this.loadData();
   }
 
@@ -52,21 +63,20 @@ export class PublicFloorPlanComponent implements AfterViewInit {
   private async loadData(): Promise<void> {
     try {
       const tablesResponse = await firstValueFrom(
-        this.api.getTables().pipe(map(response => response.data))
+        this.api.getTables().pipe(map((response) => response.data)),
       );
       this.tables = tablesResponse ?? [];
-      
+
       const zonesResponse = await firstValueFrom(
-        this.api.getZones().pipe(map(response => response.data))
+        this.api.getZones().pipe(map((response) => response.data)),
       );
       this.zones = zonesResponse ?? [];
 
       this.render();
-      
     } catch (error) {
       console.error('Ошибка загрузки схемы', error);
     }
-}
+  }
 
   private render(): void {
     this.canvas.clear();
@@ -78,24 +88,31 @@ export class PublicFloorPlanComponent implements AfterViewInit {
     const width = this.canvas.getWidth();
     const height = this.canvas.getHeight();
     for (let i = 0; i < width; i += this.gridSize) {
-      const line = new fabric.Line([i, 0, i, height], { stroke: '#ccc', strokeWidth: 1, selectable: false, evented: false });
+      const line = new fabric.Line([i, 0, i, height], {
+        stroke: '#ccc',
+        strokeWidth: 1,
+        selectable: false,
+        evented: false,
+      });
       this.canvas.add(line);
     }
     for (let i = 0; i < height; i += this.gridSize) {
-      const line = new fabric.Line([0, i, width, i], { stroke: '#ccc', strokeWidth: 1, selectable: false, evented: false });
+      const line = new fabric.Line([0, i, width, i], {
+        stroke: '#ccc',
+        strokeWidth: 1,
+        selectable: false,
+        evented: false,
+      });
       this.canvas.add(line);
     }
   }
-
   private renderTables(tables: TableItem[] | null): void {
-    
     if (!tables || tables.length === 0) return;
-    
     tables.forEach((t, index) => {
       const strokeColor = '#999';
       let fillColor = '#00ff3c';
       if (!t.active) fillColor = '#f8d7da';
-      
+
       const rect = new fabric.Rect({
         width: 50,
         height: 50,
@@ -105,9 +122,9 @@ export class PublicFloorPlanComponent implements AfterViewInit {
         rx: 6,
         ry: 6,
         selectable: false,
-        evented: true
+        evented: true,
       });
-      
+
       const text = new fabric.Text(String(t.number), {
         fontSize: 14,
         fill: '#000000',
@@ -115,13 +132,13 @@ export class PublicFloorPlanComponent implements AfterViewInit {
         originX: 'center',
         originY: 'center',
         selectable: false,
-        evented: false
+        evented: false,
       });
-      
+
       const col = index % 10;
       const row = Math.floor(index / 10);
       const spacing = 100;
-      
+
       const group = new fabric.Group([rect, text], {
         left: col * spacing + 70,
         top: row * spacing + 70,
@@ -132,26 +149,26 @@ export class PublicFloorPlanComponent implements AfterViewInit {
         hasBorders: false,
       });
       group.data = t;
-      
+
       this.canvas.add(group);
     });
-    
+
     this.canvas.renderAll();
-}
+  }
 
   private showTableInfo(group: any): void {
     this.selectedTable.emit(group);
   }
 
   getZoneName(zoneId: number): string {
-    let zone = this.zones!.find(zone => zone.id === zoneId)
+    let zone = this.zones!.find((zone) => zone.id === zoneId);
     this.zone.emit(zone);
     return zone ? zone.name : 'Не выбрана';
   }
 
   getStatusText(table: TableItem): string {
     if (table.active) return 'Свободен';
-    return 'Занят'
+    return 'Занят';
   }
 
   getStatusColor(table: TableItem): string {
@@ -163,12 +180,12 @@ export class PublicFloorPlanComponent implements AfterViewInit {
     this.loadData();
   }
 
-  getTables(zone: ZoneItem){
+  getTables(zone: ZoneItem) {
     this.zone.emit(zone);
     let tableList: TableItem[] = [];
-    for(let table of this.tables!){
-      if(table.zoneId === zone.id){
-        tableList.push(table)
+    for (let table of this.tables!) {
+      if (table.zoneId === zone.id) {
+        tableList.push(table);
       }
     }
     this.canvas.clear();

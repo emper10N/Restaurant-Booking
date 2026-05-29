@@ -8,7 +8,7 @@ import { ServiceItem } from '../../../core/models/models';
   selector: 'app-admin-services',
   standalone: true,
   imports: [ReactiveFormsModule, Card],
-  templateUrl: './admin-services.component.html'
+  templateUrl: './admin-services.component.html',
 })
 export class AdminServicesComponent {
   private readonly api = inject(AppApiService);
@@ -18,7 +18,7 @@ export class AdminServicesComponent {
   readonly form = this.fb.nonNullable.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
     description: [''],
-    price: [0, [Validators.required, Validators.min(1)]]
+    price: [0, [Validators.required, Validators.min(1)]],
   });
 
   constructor() {
@@ -26,7 +26,9 @@ export class AdminServicesComponent {
   }
 
   reload() {
-    this.api.getServices(false).subscribe((res) => this.services.set(res.data ?? []));
+    this.api
+      .getServices(false)
+      .subscribe((res) => this.services.set(res.data ?? []));
   }
 
   create() {
@@ -38,7 +40,9 @@ export class AdminServicesComponent {
   }
 
   toggle(item: ServiceItem) {
-    this.api.toggleServiceActive(item.id, !Boolean(item.available)).subscribe(() => this.reload());
+    this.api
+      .toggleServiceActive(item.id, !Boolean(item.available))
+      .subscribe(() => this.reload());
   }
 
   remove(id: number) {

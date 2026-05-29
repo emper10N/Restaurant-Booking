@@ -1,94 +1,131 @@
 <div class="fabric-planner">
-      <div class="left-panel">
-        <div class="zones-panel">
-          <h3><i class="fas fa-layer-group"></i> Зоны</h3>
-          <div class="zone-list">
-            @for (zone of zones; track zone.id) {
-              <div 
-                class="zone-item" 
-                [class.selected]="selectedZoneId === zone.id"
-                (click)="selectZone(zone.id)"
-              >
-                <span class="zone-name">{{ zone.name }}</span>
-                <div class="zone-actions-buttons">
-                  <button (click)="editZone(zone); $event.stopPropagation()"><i class="fas fa-edit"></i></button>
-                  <button (click)="deleteZone(zone.id); $event.stopPropagation()"><i class="fas fa-trash-alt"></i></button>
-                </div>
-              </div>
-            }
-          </div>
-          <div class="zone-add">
-            <button (click)="showAddZoneForm = !showAddZoneForm"><i class="fas fa-plus"></i> Добавить зону</button>
-            <div *ngIf="showAddZoneForm" class="zone-add-form">
-              <input placeholder="Название зоны" [(ngModel)]="newZoneName" />
-              <div class="color-picker-row">
-                <span class="color-label">Задать цвет:</span>
-                <input type="color" [(ngModel)]="newZoneColor" />
-              </div>
-              <div class="form-buttons">
-                <button (click)="addZone()"><i class="fas fa-check"></i> Создать</button>
-                <button (click)="cancelAddZone()"><i class="fas fa-times"></i> Отмена</button>
-              </div>
+  <div class="left-panel">
+    <div class="zones-panel">
+      <h3><i class="fas fa-layer-group"></i> Зоны</h3>
+      <div class="zone-list">
+        @for (zone of zones; track zone.id) {
+          <div
+            class="zone-item"
+            [class.selected]="selectedZoneId === zone.id"
+            (click)="selectZone(zone.id)"
+          >
+            <span class="zone-name">{{ zone.name }}</span>
+            <div class="zone-actions-buttons">
+              <button (click)="editZone(zone); $event.stopPropagation()">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button (click)="deleteZone(zone.id); $event.stopPropagation()">
+                <i class="fas fa-trash-alt"></i>
+              </button>
             </div>
           </div>
-          <div class="assign-actions">
-            <button (click)="assignSelectedTablesToZone()" [disabled]="selectedZoneId === null">
-              <i class="fas fa-link"></i> Привязать выделенные столы
+        }
+      </div>
+      <div class="zone-add">
+        <button (click)="showAddZoneForm = !showAddZoneForm">
+          <i class="fas fa-plus"></i> Добавить зону
+        </button>
+        <div *ngIf="showAddZoneForm" class="zone-add-form">
+          <input placeholder="Название зоны" [(ngModel)]="newZoneName" />
+          <div class="color-picker-row">
+            <span class="color-label">Задать цвет:</span>
+            <input type="color" [(ngModel)]="newZoneColor" />
+          </div>
+          <div class="form-buttons">
+            <button (click)="addZone()">
+              <i class="fas fa-check"></i> Создать
+            </button>
+            <button (click)="cancelAddZone()">
+              <i class="fas fa-times"></i> Отмена
             </button>
           </div>
         </div>
       </div>
+      <div class="assign-actions">
+        <button
+          (click)="assignSelectedTablesToZone()"
+          [disabled]="selectedZoneId === null"
+        >
+          <i class="fas fa-link"></i> Привязать выделенные столы
+        </button>
+      </div>
+    </div>
+  </div>
 
-      <div class="main-content">
-        <div class="toolbar">
-          <div class="tool-group">
-            <button (click)="addTable()" [disabled]="zones.length === 0"><i class="fas fa-table"></i> Стол</button>
-            <button (click)="deleteSelected()"><i class="fas fa-trash"></i> Удалить</button>
-          </div>
-          <div class="tool-group">
-            <button (click)="clearAll()"><i class="fas fa-broom"></i> Очистить всё</button>
-          </div>
-          <div class="tool-group">
-            <button (click)="exportToPNG()"><i class="fas fa-camera"></i> PNG</button>
-            <button (click)="saveToLocalStorage()"><i class="fas fa-save"></i> Сохранить</button>
-            <button (click)="exportToFile()"><i class="fas fa-file-export"></i> Экспорт</button>
-          </div>
-        </div>
-
-        <div class="canvas-wrapper">
-          <canvas #canvasEl id="floorCanvas" width="1000" height="600"></canvas>
-        </div>
+  <div class="main-content">
+    <div class="toolbar">
+      <div class="tool-group">
+        <button (click)="addTable()" [disabled]="zones.length === 0">
+          <i class="fas fa-table"></i> Стол
+        </button>
+        <button (click)="deleteSelected()">
+          <i class="fas fa-trash"></i> Удалить
+        </button>
+      </div>
+      <div class="tool-group">
+        <button (click)="clearAll()">
+          <i class="fas fa-broom"></i> Очистить всё
+        </button>
+      </div>
+      <div class="tool-group">
+        <button (click)="exportToPNG()">
+          <i class="fas fa-camera"></i> PNG
+        </button>
+        <button (click)="saveToLocalStorage()">
+          <i class="fas fa-save"></i> Сохранить
+        </button>
+        <button (click)="exportToFile()">
+          <i class="fas fa-file-export"></i> Экспорт
+        </button>
       </div>
     </div>
 
-    <div *ngIf="editingTable" class="modal-overlay" (click)="closeModal()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <h3>Редактирование стола</h3>
-        <label>Номер стола (1-100):</label>
-        <input type="number" min="1" max="100" [(ngModel)]="editTableNumber" (change)="validateNumber()" />
-        <label>Вместимость (гостей, 1-30):</label>
-        <input type="number" min="1" max="30" [(ngModel)]="editTableCapacity" (change)="updateTableSizeFromCapacity()" />
-        <label>Описание:</label>
-        <textarea rows="3" [(ngModel)]="editTableDescription"></textarea>
-        <label>Зона:</label>
-        <input [value]="getZoneNameForTable()" disabled />
-        <div class="modal-buttons">
-          <button (click)="saveTableEdit()">Сохранить</button>
-          <button (click)="closeModal()">Отмена</button>
-        </div>
-      </div>
+    <div class="canvas-wrapper">
+      <canvas #canvasEl id="floorCanvas" width="1000" height="600"></canvas>
     </div>
+  </div>
+</div>
 
-    <div *ngIf="editingZone" class="modal-overlay" (click)="closeZoneModal()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <h3>Редактирование зоны</h3>
-        <label>Название зоны:</label>
-        <input [(ngModel)]="editZoneName" />
-        <label>Цвет зоны:</label>
-        <input type="color" [(ngModel)]="editZoneColor" />
-        <div class="modal-buttons">
-          <button (click)="saveZoneEdit()">Сохранить</button>
-          <button (click)="closeZoneModal()">Отмена</button>
-        </div>
-      </div>
+<div *ngIf="editingTable" class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h3>Редактирование стола</h3>
+    <label>Номер стола (1-100):</label>
+    <input
+      type="number"
+      min="1"
+      max="100"
+      [(ngModel)]="editTableNumber"
+      (change)="validateNumber()"
+    />
+    <label>Вместимость (гостей, 1-30):</label>
+    <input
+      type="number"
+      min="1"
+      max="30"
+      [(ngModel)]="editTableCapacity"
+      (change)="updateTableSizeFromCapacity()"
+    />
+    <label>Описание:</label>
+    <textarea rows="3" [(ngModel)]="editTableDescription"></textarea>
+    <label>Зона:</label>
+    <input [value]="getZoneNameForTable()" disabled />
+    <div class="modal-buttons">
+      <button (click)="saveTableEdit()">Сохранить</button>
+      <button (click)="closeModal()">Отмена</button>
     </div>
+  </div>
+</div>
+
+<div *ngIf="editingZone" class="modal-overlay" (click)="closeZoneModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h3>Редактирование зоны</h3>
+    <label>Название зоны:</label>
+    <input [(ngModel)]="editZoneName" />
+    <label>Цвет зоны:</label>
+    <input type="color" [(ngModel)]="editZoneColor" />
+    <div class="modal-buttons">
+      <button (click)="saveZoneEdit()">Сохранить</button>
+      <button (click)="closeZoneModal()">Отмена</button>
+    </div>
+  </div>
+</div>

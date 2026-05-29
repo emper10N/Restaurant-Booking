@@ -1,23 +1,4 @@
 <p-card header="Пользователи (ADMIN)" styleClass="page-card">
-  <form [formGroup]="filters" class="grid">
-    <label class="col-12 sm:col-6 md:col-4">
-      Роль
-      <select class="w-full" formControlName="role">
-        <option value="">Все</option>
-        @for (role of roles; track role) {
-          <option [value]="role">{{ role }}</option>
-        }
-      </select>
-    </label>
-    <label class="col-12 sm:col-6 md:col-4">
-      Статус
-      <select class="w-full" formControlName="status">
-        <option value="">Все</option>
-        <option value="active">Активен</option>
-        <option value="inactive">Неактивен</option>
-      </select>
-    </label>
-  </form>
   <div class="table-scroll">
     <table>
       <thead>
@@ -41,22 +22,22 @@
             <td>{{ user.fullName }}</td>
             <td>{{ user.email }}</td>
             <td>{{ user.phone }}</td>
+            <td>{{ user.role }}</td>
             <td>
-              <select class="w-full min-w-0" [value]="user.role" (change)="changeRole(user, $any($event.target).value)">
-                @for (role of roles; track role) {
-                  <option [value]="role">{{ role }}</option>
-                }
-              </select>
-            </td>
-            <td>
-              <span [class]="user.active ? 'badge badge--on' : 'badge badge--off'">
-                {{ user.active ? 'Активен' : 'Неактивен' }}
+              <span
+                [class]="user.active ? 'badge badge--on' : 'badge badge--off'"
+              >
+                {{ user.active ? "Активен" : "Неактивен" }}
               </span>
             </td>
             <td>{{ user.createdAt!.slice(0, 10) }}</td>
             <td>
-              <button type="button" class="btn-secondary w-full sm:w-auto" (click)="toggleActive(user)">
-                {{ user.active ? 'Заблокировать' : 'Разблокировать' }}
+              <button
+                type="button"
+                class="btn-secondary w-full sm:w-auto"
+                (click)="toggleActive(user)"
+              >
+                {{ user.active ? "Заблокировать" : "Разблокировать" }}
               </button>
             </td>
           </tr>

@@ -7,7 +7,7 @@ import { Booking } from '../../core/models/models';
   selector: 'app-my-bookings',
   standalone: true,
   imports: [Card],
-  templateUrl: './my-bookings.component.html'
+  templateUrl: './my-bookings.component.html',
 })
 export class MyBookingsComponent {
   private readonly api = inject(AppApiService);
@@ -58,7 +58,7 @@ export class MyBookingsComponent {
         this.bookings.set(items);
         this.loading.set(false);
       },
-      error: () => this.loading.set(false)
+      error: () => this.loading.set(false),
     });
   }
 }

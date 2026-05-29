@@ -8,7 +8,7 @@ import { UserListItem } from '../../../core/models/models';
   selector: 'app-admin-users',
   standalone: true,
   imports: [ReactiveFormsModule, Card],
-  templateUrl: './admin-users.component.html'
+  templateUrl: './admin-users.component.html',
 })
 export class AdminUsersComponent {
   private readonly api = inject(AppApiService);
@@ -19,7 +19,7 @@ export class AdminUsersComponent {
 
   readonly filters = this.fb.group({
     role: [''],
-    status: ['']
+    status: [''],
   });
 
   readonly filteredUsers = computed(() => {
@@ -50,6 +50,8 @@ export class AdminUsersComponent {
   }
 
   toggleActive(user: UserListItem) {
-    this.api.updateUserStatus(user.id, !user.active).subscribe(() => this.reload());
+    this.api
+      .updateUserStatus(user.id, !user.active)
+      .subscribe(() => this.reload());
   }
 }

@@ -2,10 +2,22 @@
   <h3 class="mt-0">Услуги</h3>
   <div class="table-scroll">
     <table>
-      <thead><tr><th>ID</th><th>Услуга</th><th>Цена</th><th>Статус</th></tr></thead>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Услуга</th>
+          <th>Цена</th>
+          <th>Статус</th>
+        </tr>
+      </thead>
       <tbody>
         @for (item of services(); track item.id) {
-          <tr><td>{{ item.id }}</td><td>{{ item.name }}</td><td>{{ item.price }} ₽</td><td>{{ item.available ? 'Активна' : 'Неактивна' }}</td></tr>
+          <tr>
+            <td>{{ item.id }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.price }} ₽</td>
+            <td>{{ item.available ? "Активна" : "Неактивна" }}</td>
+          </tr>
         }
       </tbody>
     </table>
@@ -13,10 +25,22 @@
   <h3>Пакеты</h3>
   <div class="table-scroll">
     <table>
-      <thead><tr><th>ID</th><th>Пакет</th><th>Услуг</th><th>Цена</th></tr></thead>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Пакет</th>
+          <th>Услуг</th>
+          <th>Цена</th>
+        </tr>
+      </thead>
       <tbody>
         @for (item of packages(); track item.id) {
-          <tr><td>{{ item.id }}</td><td>{{ item.name }}</td><td>{{ item.services?.length ?? 0 }}</td><td>{{ item.totalPrice ?? 0 }} ₽</td></tr>
+          <tr>
+            <td>{{ item.id }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.services?.length ?? 0 }}</td>
+            <td>{{ item.totalPrice ?? 0 }} ₽</td>
+          </tr>
         }
       </tbody>
     </table>

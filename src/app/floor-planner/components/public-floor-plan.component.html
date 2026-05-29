@@ -1,27 +1,28 @@
 <div class="public-planner">
-      <div class="zones-sidebar">
-        <h3>Зоны</h3>
-        <div class="zone-list">
-          @for (zone of zones; track zone.id) {
-            <div class="zone-item">
-              <button (click)="getTables(zone)" type="button">{{ zone.name }}</button>
-            </div>
-          }
+  <div class="zones-sidebar">
+    <h3>Зоны</h3>
+    <div class="zone-list">
+      @for (zone of zones; track zone.id) {
+        <div class="zone-item">
+          <button (click)="getTables(zone)" type="button">
+            {{ zone.name }}
+          </button>
         </div>
-      </div>
+      }
+    </div>
+  </div>
 
-      <div class="main-area">
-        <div class="header">
-          <h2>Схема зала</h2>
-          <div class="date-time-selector">
-          </div>
-          <div class="legend">
-            <span><span class="legend-color free"></span> Свободен</span>
-            <span><span class="legend-color booked"></span> Забронирован</span>
-          </div>
-        </div>
-        <div class="canvas-container">
-          <canvas #canvasEl id="publicCanvas" width="400" height="600"></canvas>
-        </div>
+  <div class="main-area">
+    <div class="header">
+      <h2>Схема зала</h2>
+      <div class="date-time-selector"></div>
+      <div class="legend">
+        <span><span class="legend-color free"></span> Свободен</span>
+        <span><span class="legend-color booked"></span> Забронирован</span>
       </div>
     </div>
+    <div class="canvas-container">
+      <canvas #canvasEl id="publicCanvas" width="400" height="600"></canvas>
+    </div>
+  </div>
+</div>

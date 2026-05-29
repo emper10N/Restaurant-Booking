@@ -38,55 +38,55 @@ export const routes: Routes = [
 
   {
     path: 'manager/bookings',
-    canActivate: [authGuard,roleGuard],
+    canActivate: [authGuard, roleGuard],
     component: ManagerBookingsComponent,
-    data: { roles: ['MANAGER', 'ADMIN'], pageTitle: 'Все бронирования' }
+    data: { roles: ['MANAGER', 'ADMIN'], pageTitle: 'Все бронирования' },
   },
   {
     path: 'manager/tables',
-    canActivate: [authGuard,roleGuard],
+    canActivate: [authGuard, roleGuard],
     component: ManagerTablesComponent,
     data: { roles: ['MANAGER', 'ADMIN'] },
   },
   {
     path: 'manager/services',
-    canActivate: [authGuard,roleGuard],
+    canActivate: [authGuard, roleGuard],
     component: ManagerServicesComponent,
     data: { roles: ['MANAGER', 'ADMIN'] },
   },
   {
     path: 'admin/bookings',
-    canActivate: [authGuard,roleGuard],
+    canActivate: [authGuard, roleGuard],
     component: ManagerBookingsComponent,
-    data: { roles: ['ADMIN'], pageTitle: 'Управление бронированиями' }
+    data: { roles: ['ADMIN'], pageTitle: 'Управление бронированиями' },
   },
   {
     path: 'admin/tables',
-    canActivate: [authGuard,roleGuard],
+    canActivate: [authGuard, roleGuard],
     component: AdminTablesComponent,
     data: { roles: ['ADMIN'] },
   },
   {
     path: 'admin/services',
-    canActivate: [authGuard,roleGuard],
+    canActivate: [authGuard, roleGuard],
     component: AdminServicesComponent,
     data: { roles: ['ADMIN'] },
   },
   {
     path: 'admin/reasons',
-    canActivate: [authGuard,roleGuard],
+    canActivate: [authGuard, roleGuard],
     component: AdminReasonsComponent,
     data: { roles: ['ADMIN'] },
   },
   {
     path: 'admin/packages',
-    canActivate: [authGuard,roleGuard],
+    canActivate: [authGuard, roleGuard],
     component: AdminPackagesComponent,
     data: { roles: ['ADMIN'] },
   },
   {
     path: 'admin/users',
-    canActivate: [authGuard,roleGuard],
+    canActivate: [authGuard, roleGuard],
     component: AdminUsersComponent,
     data: { roles: ['ADMIN'] },
   },

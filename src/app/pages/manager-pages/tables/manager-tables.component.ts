@@ -7,7 +7,7 @@ import { TableItem, ZoneItem } from '../../../core/models/models';
   selector: 'app-manager-tables',
   standalone: true,
   imports: [Card],
-  templateUrl: './manager-tables.component.html'
+  templateUrl: './manager-tables.component.html',
 })
 export class ManagerTablesComponent {
   private readonly api = inject(AppApiService);
@@ -16,6 +16,8 @@ export class ManagerTablesComponent {
 
   constructor() {
     this.api.getZones(false).subscribe((res) => this.zones.set(res.data ?? []));
-    this.api.getTables(undefined, false).subscribe((res) => this.tables.set(res.data ?? []));
+    this.api
+      .getTables(undefined, false)
+      .subscribe((res) => this.tables.set(res.data ?? []));
   }
 }

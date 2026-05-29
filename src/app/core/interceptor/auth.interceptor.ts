@@ -10,13 +10,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const notify = inject(NotificationService);
   const token = authService.getToken();
-  const isAuthRoute = req.url.includes('/auth/login') || req.url.includes('/auth/register');
+  const isAuthRoute =
+    req.url.includes('/auth/login') || req.url.includes('/auth/register');
 
-  const request = !isAuthRoute && token
-    ? req.clone({
-        setHeaders: { Authorization: `Bearer ${token}` }
-      })
-    : req;
+  const request =
+    !isAuthRoute && token
+      ? req.clone({
+          setHeaders: { Authorization: `Bearer ${token}` },
+        })
+      : req;
 
   return next(request).pipe(
     catchError((error: HttpErrorResponse) => {
@@ -26,10 +28,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         router.navigateByUrl('/login');
       } else if (error.status === 403) {
         const msg =
-          (error.error as { message?: string } | null)?.message ?? 'Недостаточно прав для выполнения операции.';
+          (error.error as { message?: string } | null)?.message ??
+          'Недостаточно прав для выполнения операции.';
         notify.error(msg);
       }
       return throwError(() => error);
-    })
+    }),
   );
 };

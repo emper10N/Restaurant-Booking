@@ -5,51 +5,59 @@
   <form [formGroup]="form" (ngSubmit)="submit()">
     <div class="card flex flex-wrap justify-center items-end gap-2">
       <p-floatlabel class="col-12 md:col-12" variant="on">
-        <input class="w-full" formControlName="login" pInputText/>
+        <input class="w-full" formControlName="login" pInputText />
         <label for="on_label">Логин</label>
       </p-floatlabel>
 
       <p-floatlabel class="col-12 md:col-12" variant="on">
-        <p-password [toggleMask]="true"  formControlName="password"
-        [style]="{'width': '100%'}" 
-        [inputStyle]="{'width': '100%'}" 
-        autocomplete="off"
-        promptLabel="Введите пароль" 
-        weakLabel="Слабый" 
-        mediumLabel="Среднийй" 
-        strongLabel="Надёжный"
-      />
+        <p-password
+          [toggleMask]="true"
+          formControlName="password"
+          [style]="{ width: '100%' }"
+          [inputStyle]="{ width: '100%' }"
+          autocomplete="off"
+          promptLabel="Введите пароль"
+          weakLabel="Слабый"
+          mediumLabel="Среднийй"
+          strongLabel="Надёжный"
+        />
         <label for="on_label">Пароль</label>
       </p-floatlabel>
 
       <p-floatlabel class="col-12 md:col-12" variant="on">
-        <p-password [toggleMask]="true" formControlName="confirmPassword"
-        [style]="{'width': '100%'}" 
-        [inputStyle]="{'width': '100%'}"
-        [feedback]="false"
-        autocomplete="off"
-
-      />
+        <p-password
+          [toggleMask]="true"
+          formControlName="confirmPassword"
+          [style]="{ width: '100%' }"
+          [inputStyle]="{ width: '100%' }"
+          [feedback]="false"
+          autocomplete="off"
+        />
         <label for="on_label">Подтвердите пароль</label>
       </p-floatlabel>
 
       <p-floatlabel class="col-12 md:col-12" variant="on">
-        <input class="w-full" formControlName="lastName" pInputText  />
+        <input class="w-full" formControlName="lastName" pInputText />
         <label for="on_label">Фамилия</label>
       </p-floatlabel>
 
       <p-floatlabel class="col-12 md:col-12" variant="on">
-        <input class="w-full" formControlName="firstName" pInputText  />
+        <input class="w-full" formControlName="firstName" pInputText />
         <label for="on_label">Имя</label>
       </p-floatlabel>
 
       <p-floatlabel class="col-12 md:col-12" variant="on">
-        <input class="w-full" formControlName="middleName" pInputText  />
+        <input class="w-full" formControlName="middleName" pInputText />
         <label for="on_label">Отчество</label>
       </p-floatlabel>
 
       <p-floatlabel class="col-12 md:col-12" variant="on">
-        <input class="w-full" formControlName="phone" placeholder="+79991234567" pInputText />
+        <input
+          class="w-full"
+          formControlName="phone"
+          placeholder="+79991234567"
+          pInputText
+        />
         <label for="on_label">Телефон</label>
       </p-floatlabel>
 
@@ -57,9 +65,10 @@
         <input class="w-full" formControlName="email" pInputText />
         <label for="on_label">Email</label>
       </p-floatlabel>
-
     </div>
-    <button type="submit" class="w-full md:col-12" [disabled]="loading()">{{ loading() ? 'Регистрация…' : 'Зарегистрироваться' }}</button>
+    <button type="submit" class="w-full md:col-12" [disabled]="loading()">
+      {{ loading() ? "Регистрация…" : "Зарегистрироваться" }}
+    </button>
   </form>
   <p class="muted">
     Уже есть аккаунт?

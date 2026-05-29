@@ -17,8 +17,8 @@ import { ActivatedRoute } from '@angular/router';
         background: #fff;
         border-radius: 8px;
       }
-    `
-  ]
+    `,
+  ],
 })
 export class SimplePageComponent {
   private readonly route = inject(ActivatedRoute);

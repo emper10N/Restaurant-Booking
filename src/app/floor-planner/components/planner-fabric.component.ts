@@ -1,4 +1,11 @@
-import { Component, AfterViewInit, ViewChild, ElementRef, HostListener, inject } from '@angular/core';
+import {
+  Component,
+  AfterViewInit,
+  ViewChild,
+  ElementRef,
+  HostListener,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as fabric from 'fabric';
@@ -11,7 +18,7 @@ import { TableItem, ZoneItem } from '../../core/models/models';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: `./planner-fabric.component.html`,
-  styleUrl:`./planner-fabric.component.scss` 
+  styleUrl: `./planner-fabric.component.scss`,
 })
 export class PlannerFabricComponent implements AfterViewInit {
   @ViewChild('canvasEl') canvasRef!: ElementRef<HTMLCanvasElement>;
@@ -43,12 +50,14 @@ export class PlannerFabricComponent implements AfterViewInit {
   private angleIndicator: any = null;
   tables: any;
 
-  ngOnInit(){
+  ngOnInit() {
     this.loadData();
   }
 
   get statusChanged(): boolean {
-    return this.editingTable && this.editTableStatus !== this.originalTableStatus;
+    return (
+      this.editingTable && this.editTableStatus !== this.originalTableStatus
+    );
   }
 
   ngAfterViewInit(): void {
@@ -66,16 +75,16 @@ export class PlannerFabricComponent implements AfterViewInit {
     this.canvas.renderAll();
   }
 
-    private async loadData(): Promise<void> {
-      try {
-        const zonesResponse = await firstValueFrom(
-          this.api.getZones().pipe(map(response => response.data))
-        );
-        this.zones = zonesResponse ?? [];
-      } catch (error) {
-        console.error('Ошибка загрузки схемы', error);
-      }
+  private async loadData(): Promise<void> {
+    try {
+      const zonesResponse = await firstValueFrom(
+        this.api.getZones().pipe(map((response) => response.data)),
+      );
+      this.zones = zonesResponse ?? [];
+    } catch (error) {
+      console.error('Ошибка загрузки схемы', error);
     }
+  }
 
   private snapAllTablesToGrid(): void {
     const tables = this.getTablesOnCanvas();
@@ -97,16 +106,28 @@ export class PlannerFabricComponent implements AfterViewInit {
   private drawGrid(): void {
     const width = this.canvas.getWidth();
     const height = this.canvas.getHeight();
-    const oldGrid = this.canvas.getObjects().filter((obj: any) => obj.data?.isGridLine);
-    oldGrid.forEach(obj => this.canvas.remove(obj));
+    const oldGrid = this.canvas
+      .getObjects()
+      .filter((obj: any) => obj.data?.isGridLine);
+    oldGrid.forEach((obj) => this.canvas.remove(obj));
     for (let i = 0; i < width; i += this.gridSize) {
-      const line = new fabric.Line([i, 0, i, height], { stroke: '#ccc', strokeWidth: 1, selectable: false, evented: false });
+      const line = new fabric.Line([i, 0, i, height], {
+        stroke: '#ccc',
+        strokeWidth: 1,
+        selectable: false,
+        evented: false,
+      });
       (line as any).data = { isGridLine: true };
       this.canvas.add(line);
       this.canvas.sendObjectToBack(line);
     }
     for (let i = 0; i < height; i += this.gridSize) {
-      const line = new fabric.Line([0, i, width, i], { stroke: '#ccc', strokeWidth: 1, selectable: false, evented: false });
+      const line = new fabric.Line([0, i, width, i], {
+        stroke: '#ccc',
+        strokeWidth: 1,
+        selectable: false,
+        evented: false,
+      });
       (line as any).data = { isGridLine: true };
       this.canvas.add(line);
       this.canvas.sendObjectToBack(line);
@@ -166,7 +187,7 @@ export class PlannerFabricComponent implements AfterViewInit {
       backgroundColor: 'rgba(255,255,255,0.8)',
       padding: 2,
       selectable: false,
-      evented: false
+      evented: false,
     });
     this.canvas.add(this.angleIndicator);
     this.canvas.renderAll();
@@ -201,7 +222,7 @@ export class PlannerFabricComponent implements AfterViewInit {
     group.textObj.set({
       left: center.x - group.textObj.width / 2,
       top: center.y - group.textObj.height / 2,
-      angle: 0
+      angle: 0,
     });
     group.textObj.setCoords();
     this.canvas.renderAll();
@@ -221,7 +242,9 @@ export class PlannerFabricComponent implements AfterViewInit {
       if (e.ctrlKey && e.key === 'c') {
         e.preventDefault();
         const active = this.canvas.getActiveObjects();
-        const table = active.find(obj => obj.type === 'group' && (obj as any).data?.type === 'table');
+        const table = active.find(
+          (obj) => obj.type === 'group' && (obj as any).data?.type === 'table',
+        );
         if (table) {
           const rect = (table as any).getObjects()[0] as fabric.Rect;
           this.copiedTableData = {
@@ -232,7 +255,7 @@ export class PlannerFabricComponent implements AfterViewInit {
             left: table.left,
             top: table.top,
             width: rect.width,
-            height: rect.height
+            height: rect.height,
           };
         }
       } else if (e.ctrlKey && e.key === 'v') {
@@ -243,7 +266,10 @@ export class PlannerFabricComponent implements AfterViewInit {
             return;
           }
           const allTables = this.getTablesOnCanvas();
-          const maxId = allTables.length === 0 ? 0 : Math.max(...allTables.map(t => t.data.tableId));
+          const maxId =
+            allTables.length === 0
+              ? 0
+              : Math.max(...allTables.map((t) => t.data.tableId));
           const newId = maxId + 1;
           let newLeft = this.copiedTableData.left + 30;
           let newTop = this.copiedTableData.top + 30;
@@ -255,7 +281,7 @@ export class PlannerFabricComponent implements AfterViewInit {
             capacity: this.copiedTableData.capacity,
             description: this.copiedTableData.description,
             status: this.copiedTableData.status,
-            number: newId.toString()
+            number: newId.toString(),
           });
         }
       }
@@ -263,11 +289,20 @@ export class PlannerFabricComponent implements AfterViewInit {
   }
 
   private getTablesOnCanvas(): any[] {
-    return this.canvas.getObjects().filter(obj => obj.type === 'group' && (obj as any).data?.type === 'table');
+    return this.canvas
+      .getObjects()
+      .filter(
+        (obj) => obj.type === 'group' && (obj as any).data?.type === 'table',
+      );
   }
 
   addZone(name?: string, color?: string): void {
-    const newZone: ZoneItem = { id: this.nextZoneId++, name: this.newZoneName.trim(), active: true, tableCount: 0};
+    const newZone: ZoneItem = {
+      id: this.nextZoneId++,
+      name: this.newZoneName.trim(),
+      active: true,
+      tableCount: 0,
+    };
     this.zones.push(newZone);
     if (this.zones.length === 1) this.selectedZoneId = newZone.id;
     this.newZoneName = '';
@@ -305,13 +340,17 @@ export class PlannerFabricComponent implements AfterViewInit {
   }
 
   deleteZone(zoneId: number): void {
-    const tablesWithZone = this.getTablesOnCanvas().filter(t => t.data?.zoneId === zoneId);
+    const tablesWithZone = this.getTablesOnCanvas().filter(
+      (t) => t.data?.zoneId === zoneId,
+    );
     if (tablesWithZone.length > 0) {
-      alert(`Нельзя удалить зону, к ней привязано ${tablesWithZone.length} столов.`);
+      alert(
+        `Нельзя удалить зону, к ней привязано ${tablesWithZone.length} столов.`,
+      );
       return;
     }
     if (confirm('Удалить зону?')) {
-      this.zones = this.zones.filter(z => z.id !== zoneId);
+      this.zones = this.zones.filter((z) => z.id !== zoneId);
       if (this.selectedZoneId === zoneId) {
         this.selectedZoneId = this.zones.length ? this.zones[0].id : null;
       }
@@ -325,7 +364,7 @@ export class PlannerFabricComponent implements AfterViewInit {
   getZoneNameForTable(): string {
     if (!this.editingTable) return '';
     const zoneId = this.editingTable.data?.zoneId;
-    const zone = this.zones.find(z => z.id === zoneId);
+    const zone = this.zones.find((z) => z.id === zoneId);
     return zone ? zone.name : 'Не выбрана';
   }
 
@@ -338,8 +377,12 @@ export class PlannerFabricComponent implements AfterViewInit {
       alert('Выберите зону');
       return;
     }
-    const left = Math.round((this.canvas.getWidth() / 2 - 30) / this.gridSize) * this.gridSize;
-    const top = Math.round((this.canvas.getHeight() / 2 - 30) / this.gridSize) * this.gridSize;
+    const left =
+      Math.round((this.canvas.getWidth() / 2 - 30) / this.gridSize) *
+      this.gridSize;
+    const top =
+      Math.round((this.canvas.getHeight() / 2 - 30) / this.gridSize) *
+      this.gridSize;
     this.addTableAt(left, top);
   }
 
@@ -361,7 +404,9 @@ export class PlannerFabricComponent implements AfterViewInit {
   }
 
   private addTableAt(left: number, top: number, customData?: any): any {
-    const zone = this.zones.find(z => z.id === (customData?.zoneId || this.selectedZoneId));
+    const zone = this.zones.find(
+      (z) => z.id === (customData?.zoneId || this.selectedZoneId),
+    );
     const strokeColor = '#999';
     let tableId = customData?.tableId;
     if (!tableId) {
@@ -374,18 +419,29 @@ export class PlannerFabricComponent implements AfterViewInit {
     const description = customData?.description || '';
     const status = customData?.status || 'free';
 
-    const statusColor = status === 'free' ? '#d4edda' : status === 'booked' ? '#f8d7da' : '#fff3cd';
+    const statusColor =
+      status === 'free'
+        ? '#d4edda'
+        : status === 'booked'
+          ? '#f8d7da'
+          : '#fff3cd';
     const rect = new fabric.Rect({
-      width: width, height: 60,
+      width: width,
+      height: 60,
       fill: statusColor,
       stroke: strokeColor,
       strokeWidth: 3,
-      rx: 6, ry: 6,
-      lockScalingX: false, lockScalingY: true
+      rx: 6,
+      ry: 6,
+      lockScalingX: false,
+      lockScalingY: true,
     });
     const group = new fabric.Group([rect], {
-      left, top, hasControls: true,
-      lockScalingX: false, lockScalingY: true
+      left,
+      top,
+      hasControls: true,
+      lockScalingX: false,
+      lockScalingY: true,
     });
     group.data = {
       tableId,
@@ -394,7 +450,7 @@ export class PlannerFabricComponent implements AfterViewInit {
       number,
       capacity,
       description,
-      status
+      status,
     };
     const textObj = new fabric.Text(number, {
       fontSize: 14,
@@ -403,7 +459,7 @@ export class PlannerFabricComponent implements AfterViewInit {
       originX: 'center',
       originY: 'center',
       selectable: false,
-      evented: false
+      evented: false,
     });
     (group as any).textObj = textObj;
     this.canvas.add(group);
@@ -448,7 +504,9 @@ export class PlannerFabricComponent implements AfterViewInit {
   saveTableEdit(): void {
     if (!this.editingTable) return;
     if (this.statusChanged) {
-      const confirmChange = confirm('⚠️ Вы уверены, что хотите изменить статус стола? Это может повлиять на бронирования.');
+      const confirmChange = confirm(
+        '⚠️ Вы уверены, что хотите изменить статус стола? Это может повлиять на бронирования.',
+      );
       if (!confirmChange) return;
     }
     let num = parseInt(this.editTableNumber);
@@ -470,7 +528,12 @@ export class PlannerFabricComponent implements AfterViewInit {
     const rect = (this.editingTable as any).getObjects()[0] as fabric.Rect;
     const newWidth = this.calculateWidth(this.editTableCapacity);
     rect.set('width', newWidth);
-    const statusColor = this.editTableStatus === 'free' ? '#d4edda' : this.editTableStatus === 'booked' ? '#f8d7da' : '#fff3cd';
+    const statusColor =
+      this.editTableStatus === 'free'
+        ? '#d4edda'
+        : this.editTableStatus === 'booked'
+          ? '#f8d7da'
+          : '#fff3cd';
     rect.set('fill', statusColor);
     this.editingTable.setCoords();
     this.updateTableTextPosition(this.editingTable);
@@ -485,13 +548,15 @@ export class PlannerFabricComponent implements AfterViewInit {
 
   deleteSelected(): void {
     const active = this.canvas.getActiveObjects();
-    const toDelete = active.filter(obj => obj.type === 'group' || (obj as any).data?.type === 'text');
+    const toDelete = active.filter(
+      (obj) => obj.type === 'group' || (obj as any).data?.type === 'text',
+    );
     if (toDelete.length === 0) {
       alert('Выделите объекты для удаления');
       return;
     }
     if (confirm(`Удалить ${toDelete.length} выбранных элементов?`)) {
-      toDelete.forEach(obj => {
+      toDelete.forEach((obj) => {
         if ((obj as any).textObj) this.canvas.remove((obj as any).textObj);
         this.canvas.remove(obj);
       });
@@ -502,11 +567,19 @@ export class PlannerFabricComponent implements AfterViewInit {
   }
 
   assignSelectedTablesToZone(): void {
-    if (this.selectedZoneId === null) { alert('Выберите зону'); return; }
+    if (this.selectedZoneId === null) {
+      alert('Выберите зону');
+      return;
+    }
     const active = this.canvas.getActiveObjects();
-    const tables = active.filter(obj => obj.type === 'group' && (obj as any).data?.type === 'table');
-    if (!tables.length) { alert('Выделите столы'); return; }
-    const newZone = this.zones.find(z => z.id === this.selectedZoneId)!;
+    const tables = active.filter(
+      (obj) => obj.type === 'group' && (obj as any).data?.type === 'table',
+    );
+    if (!tables.length) {
+      alert('Выделите столы');
+      return;
+    }
+    const newZone = this.zones.find((z) => z.id === this.selectedZoneId)!;
     for (const t of tables) {
       t.data.zoneId = this.selectedZoneId;
       const rect = (t as any).getObjects()[0] as fabric.Rect;
@@ -523,8 +596,10 @@ export class PlannerFabricComponent implements AfterViewInit {
 
   clearAll(): void {
     if (confirm('Очистить всю схему? Все столы и тексты будут удалены.')) {
-      const toRemove = this.canvas.getObjects().filter((obj: any) => !obj.data?.isGridLine);
-      toRemove.forEach(obj => {
+      const toRemove = this.canvas
+        .getObjects()
+        .filter((obj: any) => !obj.data?.isGridLine);
+      toRemove.forEach((obj) => {
         if ((obj as any).textObj) this.canvas.remove((obj as any).textObj);
         this.canvas.remove(obj);
       });
@@ -537,7 +612,12 @@ export class PlannerFabricComponent implements AfterViewInit {
     const left = this.canvas.getWidth() / 2;
     const top = this.canvas.getHeight() / 2;
     const text = new fabric.IText('Новый текст', {
-      left, top, fontSize: 20, fill: '#000', editable: true, hasControls: true
+      left,
+      top,
+      fontSize: 20,
+      fill: '#000',
+      editable: true,
+      hasControls: true,
     });
     text.data = { type: 'text' };
     this.canvas.add(text);
@@ -553,7 +633,7 @@ export class PlannerFabricComponent implements AfterViewInit {
   }
 
   saveToLocalStorage(): void {
-    const tablesData = this.getTablesOnCanvas().map(table => {
+    const tablesData = this.getTablesOnCanvas().map((table) => {
       const rect = (table as any).getObjects()[0] as fabric.Rect;
       return {
         tableId: table.data.tableId,
@@ -566,21 +646,31 @@ export class PlannerFabricComponent implements AfterViewInit {
         number: table.data.number,
         capacity: table.data.capacity,
         description: table.data.description,
-        status: table.data.status
+        status: table.data.status,
       };
     });
-    const textsData = this.canvas.getObjects()
+    const textsData = this.canvas
+      .getObjects()
       .filter((obj: any) => obj.data?.type === 'text')
-      .map(t => ({ text: (t as fabric.Text).text, left: t.left, top: t.top, fontSize: (t as fabric.Text).fontSize, fill: (t as fabric.Text).fill }));
-    const state = { zones: this.zones, tables: tablesData, texts: textsData, version: 8 };
+      .map((t) => ({
+        text: (t as fabric.Text).text,
+        left: t.left,
+        top: t.top,
+        fontSize: (t as fabric.Text).fontSize,
+        fill: (t as fabric.Text).fill,
+      }));
+    const state = {
+      zones: this.zones,
+      tables: tablesData,
+      texts: textsData,
+      version: 8,
+    };
     localStorage.setItem('floor_plan', JSON.stringify(state));
     alert('Схема сохранена');
   }
 
-
-
   exportToFile(): void {
-    const tablesData = this.getTablesOnCanvas().map(table => {
+    const tablesData = this.getTablesOnCanvas().map((table) => {
       const rect = (table as any).getObjects()[0] as fabric.Rect;
       return {
         tableId: table.data.tableId,
@@ -593,14 +683,29 @@ export class PlannerFabricComponent implements AfterViewInit {
         number: table.data.number,
         capacity: table.data.capacity,
         description: table.data.description,
-        status: table.data.status
+        status: table.data.status,
       };
     });
-    const textsData = this.canvas.getObjects()
+    const textsData = this.canvas
+      .getObjects()
       .filter((obj: any) => obj.data?.type === 'text')
-      .map(t => ({ text: (t as fabric.Text).text, left: t.left, top: t.top, fontSize: (t as fabric.Text).fontSize, fill: (t as fabric.Text).fill }));
-    const state = { zones: this.zones, tables: tablesData, texts: textsData, version: 8, exportDate: new Date().toISOString() };
-    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      .map((t) => ({
+        text: (t as fabric.Text).text,
+        left: t.left,
+        top: t.top,
+        fontSize: (t as fabric.Text).fontSize,
+        fill: (t as fabric.Text).fill,
+      }));
+    const state = {
+      zones: this.zones,
+      tables: tablesData,
+      texts: textsData,
+      version: 8,
+      exportDate: new Date().toISOString(),
+    };
+    const blob = new Blob([JSON.stringify(state, null, 2)], {
+      type: 'application/json',
+    });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `floor_plan_${Date.now()}.json`;
@@ -624,68 +729,67 @@ export class PlannerFabricComponent implements AfterViewInit {
     }
   }
 
-    getTables(zone: ZoneItem){
-      let tableList: TableItem[] = [];
-      for(let table of this.tables!){
-        if(table.zoneId === zone.id){
-          tableList.push(table)
-        }
+  getTables(zone: ZoneItem) {
+    let tableList: TableItem[] = [];
+    for (let table of this.tables!) {
+      if (table.zoneId === zone.id) {
+        tableList.push(table);
       }
-      this.canvas.clear();
-      this.drawGrid();
-      this.renderTables(tableList);
-      this.canvas.renderAll();
     }
+    this.canvas.clear();
+    this.drawGrid();
+    this.renderTables(tableList);
+    this.canvas.renderAll();
+  }
 
-    private renderTables(tables: TableItem[] | null): void {
-        
-        if (!tables || tables.length === 0) return;
-        
-        tables.forEach((t, index) => {
-          const strokeColor = '#999';
-          let fillColor = '#00ff3c';
-          if (!t.active) fillColor = '#f8d7da';
-          
-          const rect = new fabric.Rect({
-            width: 50,
-            height: 50,
-            fill: fillColor,
-            stroke: strokeColor,
-            strokeWidth: 3,
-            rx: 6,
-            ry: 6,
-            selectable: false,
-            evented: true
-          });
-          
-          const text = new fabric.Text(String(t.number), {
-            fontSize: 14,
-            fill: '#000000',
-            fontWeight: 'bold',
-            originX: 'center',
-            originY: 'center',
-            selectable: false,
-            evented: false
-          });
-          
-          const col = index % 5;
-          const row = Math.floor(index / 5);
-          const spacing = 70;
-          
-          const group = new fabric.Group([rect, text], {
-            left: col * spacing + 50,
-            top: row * spacing + 50,
-            angle: 0,
-            selectable: false,
-            evented: true,
-            hasControls: false,
-            hasBorders: false,
-          });
-          group.data = t;
-          
-          this.canvas.add(group);
-        });
-        
-        this.canvas.renderAll();
-    }
+  private renderTables(tables: TableItem[] | null): void {
+    if (!tables || tables.length === 0) return;
+
+    tables.forEach((t, index) => {
+      const strokeColor = '#999';
+      let fillColor = '#00ff3c';
+      if (!t.active) fillColor = '#f8d7da';
+
+      const rect = new fabric.Rect({
+        width: 50,
+        height: 50,
+        fill: fillColor,
+        stroke: strokeColor,
+        strokeWidth: 3,
+        rx: 6,
+        ry: 6,
+        selectable: false,
+        evented: true,
+      });
+
+      const text = new fabric.Text(String(t.number), {
+        fontSize: 14,
+        fill: '#000000',
+        fontWeight: 'bold',
+        originX: 'center',
+        originY: 'center',
+        selectable: false,
+        evented: false,
+      });
+
+      const col = index % 5;
+      const row = Math.floor(index / 5);
+      const spacing = 70;
+
+      const group = new fabric.Group([rect, text], {
+        left: col * spacing + 50,
+        top: row * spacing + 50,
+        angle: 0,
+        selectable: false,
+        evented: true,
+        hasControls: false,
+        hasBorders: false,
+      });
+      group.data = t;
+
+      this.canvas.add(group);
+    });
+
+    this.canvas.renderAll();
+  }
 }
